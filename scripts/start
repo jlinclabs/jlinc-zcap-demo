@@ -1,0 +1,23 @@
+#!/usr/bin/env node
+
+const http = require('http')
+const { createApp } = require('../app')
+
+const COLORS = `red orange yellow green blue purple`.split(' ')
+const poolSize = 3
+const apps = []
+while (apps.length < poolSize) {
+  const index = apps.length
+  const appName = `App#${index + 1}`
+  console.log({ appName })
+  const app = createApp({
+    appName,
+    port: `300${index}`,
+    appColor: COLORS[index],
+  })
+  apps.push(app)
+  app.start(error => {
+    if (error) console.error(error)
+    else console.log(`${appName} http://localhost:${app.server.address().port}`)
+  })
+}

@@ -1,0 +1,28 @@
+{
+  "private": true,
+  "name": "jlinc-zcap-demo",
+  "version": "1.0.0",
+  "scripts": {
+    "start": "./scripts/start",
+    "start:dev": "nodemon --exec 'npm start'"
+  },
+  "keywords": [],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/jlinclabs/jlinc-zcap-demo.git"
+  },
+  "author": "Jared Grippe",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/jlinclabs/jlinc-zcap-demo/issues"
+  },
+  "homepage": "https://github.com/jlinclabs/jlinc-zcap-demo#readme",
+  "dependencies": {
+    "@jlinc/zcap": "github:jlinclabs/jlinc-zcap",
+    "body-parser": "^1.19.2",
+    "cookie-parse": "^0.4.0",
+    "cookie-parser": "^1.4.6",
+    "express": "^4.17.3",
+    "express-hbs": "^2.4.0"
+  }
+}

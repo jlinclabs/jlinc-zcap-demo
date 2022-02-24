@@ -5,7 +5,6 @@ const hbs = require('express-hbs')
 const jwt = require('jsonwebtoken')
 
 function createApp({ apps, appName, appColor, port }){
-  const SESSION_SECRET = `dont tell anyone this is ${appName}`
 
   const app = express()
   app.port = port
@@ -13,7 +12,7 @@ function createApp({ apps, appName, appColor, port }){
   app.use(express.static(__dirname + '/public'));
   app.use(bodyParser.urlencoded({ extended: false }))
   app.use(bodyParser.json({ }))
-  app.use(cookieParser(SESSION_SECRET, {}))
+  app.use(cookieParser())
   // Use `.hbs` for extensions and find partials in `views/partials`.
   app.engine('hbs', hbs.express4({
     partialsDir: __dirname + '/views/partials',
@@ -28,10 +27,12 @@ function createApp({ apps, appName, appColor, port }){
     getAppUrls: () => apps.map(app => app.url),
   })
 
+  const SESSION_SECRET = `dont tell anyone this is ${appName}`
+  const COOKIE_NAME = `session${port}` // cookies are shared across localhost
   // ROUTES
   app.use('*', (req, res, next) => {
-    console.log('COOKIES', req.signedCookies)
-    const sessionJwt = req.cookies.session
+    console.log('COOKIES', req.cookies)
+    const sessionJwt = req.cookies[COOKIE_NAME]
     const setSession = (error, session) => {
       if (error) res.cookie('session', null)
       res.locals.session = session
@@ -53,17 +54,17 @@ function createApp({ apps, appName, appColor, port }){
     const sessionJwt = jwt.sign(session, SESSION_SECRET, { expiresIn: 86400 });
     res
       .status(200)
-      .cookie('session', sessionJwt, {
-        domain: `localhost:${port}`,
+      .cookie(COOKIE_NAME, sessionJwt, {
+        // domain: `localhost:${port}`,
         httpOnly: true,
-        signed: true,
+        // signed: true,
         // sameSite: true,
       })
       .redirect('/')
   })
 
   app.post('/logout', (req, res) => {
-    res.status(200).cookie('session', null).redirect('/')
+    res.status(200).clearCookie(COOKIE_NAME).redirect('/')
   })
 
   app.start = function start(callback){

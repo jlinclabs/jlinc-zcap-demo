@@ -11,6 +11,7 @@ while (apps.length < poolSize) {
   const appName = `App#${index + 1}`
   console.log({ appName })
   const app = createApp({
+    apps,
     appName,
     port: `300${index}`,
     appColor: COLORS[index],

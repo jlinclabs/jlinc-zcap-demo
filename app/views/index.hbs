@@ -8,7 +8,7 @@
   </head>
   <body>
     <div class="container">
-      <h1>{{appName}}</h1>
+      <h1>{{appUrl}}</h1>
       {{#if session}}
         <h2>Logged in as:</h2>
         <h3>DID: {{session.did}}</h3>
@@ -30,5 +30,15 @@
         </form>
       {{/if}}
     </div>
+
+    <hr/>
+    <footer>
+      <h5>Other Apps</h5>
+      <ol>
+        {{#each getAppUrls}}
+          <li><a href="{{this}}">{{this}}</a></li>
+        {{/each}}
+      </ol>
+    </footer>
   </body>
 </html>

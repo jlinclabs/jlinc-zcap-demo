@@ -35,8 +35,14 @@
     <footer>
       <h5>Other Apps</h5>
       <ol>
-        {{#each getAppUrls}}
-          <li><a href="{{this}}">{{this}}</a></li>
+        {{#each getOtherAppUrls}}
+          <li>
+            <a href="{{this}}">{{this}}</a>
+            {{#if ../session}}
+              <span> | </span>
+              <a href="/send-me-to?app={{this}}">login as {{session.email}}</a>
+            {{/if}}
+          </li>
         {{/each}}
       </ol>
     </footer>

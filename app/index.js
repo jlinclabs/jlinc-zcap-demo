@@ -24,7 +24,11 @@ function createApp({ apps, appName, appColor, port }){
     appUrl: app.url,
     appName,
     appColor,
-    getAppUrls: () => apps.map(app => app.url),
+    getOtherAppUrls: () => (
+      apps
+        .filter(a => a !== app)
+        .map(app => app.url)
+    ),
   })
 
   const SESSION_SECRET = `dont tell anyone this is ${appName}`
@@ -65,6 +69,22 @@ function createApp({ apps, appName, appColor, port }){
 
   app.post('/logout', (req, res) => {
     res.status(200).clearCookie(COOKIE_NAME).redirect('/')
+  })
+
+  app.get('/send-me-to', (req, res) => {
+    const appUrl = req.query.app
+    if (!appUrl || !apps.find(app => app.url === appUrl)){
+      res.status(500).send(`ERROR: bad app url`)
+    }else{
+      res.redirect(`${req.query.app}/zcap-login?zcap=2u3h21jh3j12h3kj21hjkh321jk3h`)
+    }
+  })
+
+  app.get('/zcap-login', (req, res) => {
+    const zcap = req.query.zcap
+    res.send(`MAGIC LOGIN TBD: ${zcap}`)
+    // TODO login magic
+    // res.redirect('/')
   })
 
   app.start = function start(callback){

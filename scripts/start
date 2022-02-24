@@ -6,6 +6,13 @@ const { createApp } = require('../app')
 const COLORS = `red orange yellow green blue purple`.split(' ')
 const poolSize = 3
 const apps = []
+
+// TODO define a profile of apps with differnt:
+// - domains
+// - relationships to eachother
+// - database urls
+// hard code the keys here in a config objet
+
 while (apps.length < poolSize) {
   const index = apps.length
   const appName = `App#${index + 1}`

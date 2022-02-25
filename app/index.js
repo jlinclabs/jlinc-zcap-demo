@@ -4,11 +4,12 @@ const cookieParser = require('cookie-parser')
 const hbs = require('express-hbs')
 const jwt = require('jsonwebtoken')
 
-function createApp({ apps, appName, appColor, port }){
-
+function createApp(options){
+  const appName = options.name
   const app = express()
-  app.port = port
-  app.url = `http://localhost:${port}`
+  // Object.assign(app, options)
+  app.port = options.port
+  app.url = options.url
   app.use(express.static(__dirname + '/public'));
   app.use(bodyParser.urlencoded({ extended: false }))
   app.use(bodyParser.json({ }))
@@ -21,21 +22,15 @@ function createApp({ apps, appName, appColor, port }){
   app.set('view engine', 'hbs')
   app.set('views', __dirname + '/views')
   Object.assign(app.locals, {
-    appUrl: app.url,
-    appName,
-    appColor,
-    getOtherAppUrls: () => (
-      apps
-        .filter(a => a !== app)
-        .map(app => app.url)
-    ),
+    app: options,
+    otherApps: options.otherApps,
   })
 
   const SESSION_SECRET = `dont tell anyone this is ${appName}`
-  const COOKIE_NAME = `session${port}` // cookies are shared across localhost
+  const COOKIE_NAME = `session${app.port}` // cookies are shared across localhost
   // ROUTES
   app.use('*', (req, res, next) => {
-    console.log('COOKIES', req.cookies)
+    // console.log('COOKIES', req.cookies)
     const sessionJwt = req.cookies[COOKIE_NAME]
     const setSession = (error, session) => {
       if (error) res.cookie('session', null)
@@ -72,11 +67,12 @@ function createApp({ apps, appName, appColor, port }){
   })
 
   app.get('/send-me-to', (req, res) => {
-    const appUrl = req.query.app
-    if (!appUrl || !apps.find(app => app.url === appUrl)){
+    const appName = req.query.app
+    const app = options.otherApps.find(app => app.name === appName)
+    if (!app){
       res.status(500).send(`ERROR: bad app url`)
     }else{
-      res.redirect(`${req.query.app}/zcap-login?zcap=2u3h21jh3j12h3kj21hjkh321jk3h`)
+      res.redirect(`${app.url}/zcap-login?zcap=2u3h21jh3j12h3kj21hjkh321jk3h`)
     }
   })
 
@@ -88,7 +84,7 @@ function createApp({ apps, appName, appColor, port }){
   })
 
   app.start = function start(callback){
-    app.server = app.listen(port, callback)
+    app.server = app.listen(app.port, callback)
   }
 
   return app

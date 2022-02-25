@@ -27,7 +27,7 @@ function createApp(options){
   })
 
   const SESSION_SECRET = `dont tell anyone this is ${appName}`
-  const COOKIE_NAME = `session${app.port}` // cookies are shared across localhost
+  const COOKIE_NAME = `session`
   // ROUTES
   app.use('*', (req, res, next) => {
     // console.log('COOKIES', req.cookies)
@@ -54,7 +54,7 @@ function createApp(options){
     res
       .status(200)
       .cookie(COOKIE_NAME, sessionJwt, {
-        // domain: `localhost:${port}`,
+        domain: options.url, // extract domain
         httpOnly: true,
         // signed: true,
         // sameSite: true,

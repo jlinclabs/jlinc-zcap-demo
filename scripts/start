@@ -2,7 +2,7 @@
 
 const http = require('http')
 const { createApp } = require('../app')
-
+const zcap = require('@jlinc/zcap')
 
 const Apps = [
   {
@@ -11,6 +11,11 @@ const Apps = [
     port: 4000,
     url: 'https://cat-walkers.zcap.test',
     databaseUrl: 'postgresql://localhost/zcap-demo-cat-walkers',
+    zcapActor: {
+      did: 'did:jlinc:Vhm9DAjSjDeWhONHiKsPagxUq-YRKl-vug3ZU_VfCzI',
+      publicKey: 'Vhm9DAjSjDeWhONHiKsPagxUq-YRKl-vug3ZU_VfCzI',
+      secretKey: 'CwPlO0vT9ThFPC2KYiZUBwKQICSinlKhfnAx8jdShhVWGb0MCNKMN5aE40eIqw9qDFSr5hEqX6-6DdlT9V8LMg'
+    },
   },
   {
     name: 'BadBirders',
@@ -18,6 +23,11 @@ const Apps = [
     port: 4001,
     url: 'https://bad-birders.zcap.test',
     databaseUrl: 'postgresql://localhost/zcap-demo-bad-birders',
+    zcapActor: {
+      did: 'did:jlinc:bN1S_cd5AHSMQWkCC0D3GhsjMt56d5M8jK73DX0X43w',
+      publicKey: 'bN1S_cd5AHSMQWkCC0D3GhsjMt56d5M8jK73DX0X43w',
+      secretKey: 'cLxUjUS70iQSDa5PdA2jcxfOAuD87-XT8I2AMoBhqRNs3VL9x3kAdIxBaQILQPcaGyMy3np3kzyMrvcNfRfjfA'
+    },
   },
   {
     name: 'DopeDogs',
@@ -25,15 +35,13 @@ const Apps = [
     port: 4002,
     url: 'https://dope-dogs.zcap.test',
     databaseUrl: 'postgresql://localhost/zcap-demo-drope-dogs',
-  }
+    zcapActor: {
+      did: 'did:jlinc:ZnReOb0KO6WCDJA0ySY-6l4EaZ6e0BRRTc5q1RxgiPY',
+      publicKey: 'ZnReOb0KO6WCDJA0ySY-6l4EaZ6e0BRRTc5q1RxgiPY',
+      secretKey: 'XP3K6Fh4NVRmECQpqZwitVWLnZvXvDGfRJ5Hrir7KtJmdF45vQo7pYIMkDTJJj7qXgRpnp7QFFFNzmrVHGCI9g'
+    },
+  },
 ]
-
-
-// TODO define a profile of apps with differnt:
-// - domains
-// - relationships to eachother
-// - database urls
-// hard code the keys here in a config objet
 
 const apps = []
 for (const options of Apps) {

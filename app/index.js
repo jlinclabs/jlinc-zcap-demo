@@ -3,6 +3,11 @@ const bodyParser = require('body-parser')
 const cookieParser = require('cookie-parser')
 const hbs = require('express-hbs')
 const jwt = require('jsonwebtoken')
+const parseUrl = require('url').parse
+
+hbs.handlebars.registerHelper('toJSON', object =>
+  new hbs.handlebars.SafeString(JSON.stringify(object), null, 2)
+)
 
 function createApp(options){
   const appName = options.name
@@ -18,6 +23,9 @@ function createApp(options){
   app.engine('hbs', hbs.express4({
     partialsDir: __dirname + '/views/partials',
     // defaultLayout: __dirname + '/views/layout/default.hbs',
+    // helpers: {
+    //   toJSON: JSON.stringify,
+    // }
   }))
   app.set('view engine', 'hbs')
   app.set('views', __dirname + '/views')
@@ -54,7 +62,7 @@ function createApp(options){
     res
       .status(200)
       .cookie(COOKIE_NAME, sessionJwt, {
-        domain: options.url, // extract domain
+        domain: parseUrl(options.url).hostname,
         httpOnly: true,
         // signed: true,
         // sameSite: true,

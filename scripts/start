@@ -4,7 +4,7 @@ const Path = require('path')
 const http = require('http')
 const { createApp } = require('../app')
 
-const configPath = Path.resolve(process.argv[2] || '../config.json')
+const configPath = Path.resolve(process.argv[2] || 'config.json')
 if (!configPath) {
   console.error(`configPath=${configPath}`)
   process.exit(1)

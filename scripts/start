@@ -9,10 +9,11 @@ if (!configPath) {
   console.error(`configPath=${configPath}`)
   process.exit(1)
 }
-const config = require(configPath)
 
+const config = require(configPath)
+if (process.env.PORT) config.port = process.env.PORT
 const app = createApp(config)
 app.start(error => {
   if (error) console.error(error)
-  else console.log(`${app.name} ${app.url}`)
+  else console.log(`${app.name} PORT=${app.port} ${app.url}`)
 })

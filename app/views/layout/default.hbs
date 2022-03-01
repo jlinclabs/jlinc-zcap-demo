@@ -2,14 +2,46 @@
 <html>
   <head>
     <title>{{title}}</title>
-    <link type="text/css" rel="stylesheet" href="bootstrap/css/bootstrap.css"/>
+    <link type="text/css" rel="stylesheet" href="/almond.css"/>
     <link type="text/css" rel="stylesheet" href="/index.css"/>
-    <script type="application/javascript" src="/bootstrap/js/bootstrap.js"></script>
+    <style>
+      :root {
+        --app-color: {{app.color}};
+      }
+      html {
+        background-color: var(--app-color);
+      }
+    </style>
   </head>
-  <body style="--app-color: {{app.color}}; background-color: var(--app-color);">
+  <body>
     <div class="container">
-      <a href="/"><h1>{{app.name}}</h1></a>
+      <h1><a href="/" class="home-link"> </a> {{app.name}}</h1>
+
+      <ul>
+        <li><a href="/">home</a></li>
+        {{#if session}}
+          <li>
+            <form method="post" action="/logout">
+              <a href="/logout" onclick="this.parentElement.submit(); return false">logout</a>
+            </form>
+          </li>
+        {{else}}
+          <li><a href="/login">login</a></li>
+        {{/if}}
+      </ul>
+
+
+      {{#if session}}
+        <h4>Logged in as:</h4>
+        <dl>
+          <dt>DID</dt><dd>{{session.did}}</dd>
+          <dt>Email</dt><dd>{{session.email}}</dd>
+        </dl>
+      {{else}}
+        <h4>Not Logged in</h4>
+      {{/if}}
       {{{body}}}
     </div>
   </body>
 </html>
+

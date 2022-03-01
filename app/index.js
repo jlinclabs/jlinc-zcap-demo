@@ -55,6 +55,10 @@ function createApp(options){
     res.render('index')
   })
 
+  app.get('/login', (req, res) => {
+    res.render('login')
+  })
+
   app.post('/login', (req, res) => {
     const { email, password } = req.body
     let session

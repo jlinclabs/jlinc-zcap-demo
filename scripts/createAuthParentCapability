@@ -1,0 +1,23 @@
+#!/usr/bin/env node
+
+const http = require('http')
+const zcap = require('@jlinc/zcap')
+
+const fromApp = require(`../apps/${process.argv[2]}`)
+const toApp = require(`../apps/${process.argv[3]}`)
+const targetUri = `${toApp.url}/zcap-login`
+
+if (fromApp.zcapCapabilities)
+  for (const capability of fromApp.zcapCapabilities){
+    console.log(capability.targetUri, '===', targetUri)
+    if (capability.targetUri === targetUri)
+      throw new Error(`already exists`)
+  }
+
+const authParentCapability = zcap.createParentCapability(
+  {...fromApp.zcapIdentity, issuerUri: fromApp.url},
+  `${toApp.url}/zcap-login`,
+  ['authorization'],
+)
+
+console.log(JSON.stringify(authParentCapability, null, 2))

@@ -3,6 +3,7 @@ const bodyParser = require('body-parser')
 const cookieParser = require('cookie-parser')
 const hbs = require('express-hbs')
 const jwt = require('jsonwebtoken')
+const zcap = require('@jlinc/zcap')
 const parseUrl = require('url').parse
 
 hbs.handlebars.registerHelper('toJSON', object =>
@@ -10,6 +11,7 @@ hbs.handlebars.registerHelper('toJSON', object =>
 )
 
 function createApp(options){
+  console.log('CREATE APP', options)
   const appName = options.name
   const app = express()
   // Object.assign(app, options)
@@ -19,26 +21,27 @@ function createApp(options){
   app.use(bodyParser.urlencoded({ extended: false }))
   app.use(bodyParser.json({ }))
   app.use(cookieParser())
-  // Use `.hbs` for extensions and find partials in `views/partials`.
   app.engine('hbs', hbs.express4({
     partialsDir: __dirname + '/views/partials',
-    // defaultLayout: __dirname + '/views/layout/default.hbs',
-    // helpers: {
-    //   toJSON: JSON.stringify,
-    // }
+    defaultLayout: __dirname + '/views/layout/default.hbs',
   }))
   app.set('view engine', 'hbs')
   app.set('views', __dirname + '/views')
   Object.assign(app.locals, {
     app: options,
-    otherApps: options.otherApps,
+    partnerApps: options.zcapCapabilities.map(zc => {
+      let url = parseUrl(zc.targetUri)
+      url = `${url.protocol}//${url.host}`
+      const name = url
+      return { name, url }
+    })
   })
 
   const SESSION_SECRET = `dont tell anyone this is ${appName}`
   const COOKIE_NAME = `session`
+
   // ROUTES
   app.use('*', (req, res, next) => {
-    // console.log('COOKIES', req.cookies)
     const sessionJwt = req.cookies[COOKIE_NAME]
     const setSession = (error, session) => {
       if (error) res.cookie('session', null)
@@ -54,20 +57,27 @@ function createApp(options){
   })
 
   app.post('/login', (req, res) => {
-    const session = {
-      did: 'did:jlinc:8AZLka1zkZ8Ve5bK_mS9QwS9oTkTX4IgwhPR4FW99iQ',
-      email: 'frog@example.com',
+    const { email, password } = req.body
+    let session
+    for (const user of options.users){
+      if (user.email === email && user.password === password){
+        session = { email, did: user.zcapIdentity.did }
+      }
     }
-    const sessionJwt = jwt.sign(session, SESSION_SECRET, { expiresIn: 86400 });
-    res
-      .status(200)
-      .cookie(COOKIE_NAME, sessionJwt, {
-        domain: parseUrl(options.url).hostname,
-        httpOnly: true,
-        // signed: true,
-        // sameSite: true,
-      })
-      .redirect('/')
+    if (session){
+      const sessionJwt = jwt.sign(session, SESSION_SECRET, { expiresIn: 86400 });
+      res
+        .status(200)
+        .cookie(COOKIE_NAME, sessionJwt)
+        .redirect('/')
+    }else{
+      res
+        .status(200)
+        .clearCookie(COOKIE_NAME)
+        .render('error', {
+          error: { message: 'bad username or password' },
+        })
+    }
   })
 
   app.post('/logout', (req, res) => {
@@ -75,18 +85,49 @@ function createApp(options){
   })
 
   app.get('/send-me-to', (req, res) => {
-    const appName = req.query.app
-    const app = options.otherApps.find(app => app.name === appName)
-    if (!app){
-      res.status(500).send(`ERROR: bad app url`)
-    }else{
-      res.redirect(`${app.url}/zcap-login?zcap=2u3h21jh3j12h3kj21hjkh321jk3h`)
-    }
+    const { email } = res.locals.session
+    const appUrl = req.query.app
+    const user = options.users.find(user => user.email === email)
+    if (!user) throw new Error(`cant find user email="${email}"`)
+
+    const capability = options.zcapCapabilities.find(capability =>
+      capability.targetUri.startsWith(appUrl)
+    )
+    if (!capability) throw new Error(`cant find capability`)
+
+    const delegatedCapability = zcap.delegate(
+      user.zcapIdentity,
+      capability.id,
+      options.zcapIdentity,
+      ['authorization'],
+      { email },
+    );
+
+    const jwt = zcap.invokeDelegable(
+      user.zcapIdentity,
+      delegatedCapability,
+    );
+
+    res.redirect(`${capability.targetUri}?zcap=${jwt}`)
   })
 
   app.get('/zcap-login', (req, res) => {
-    const zcap = req.query.zcap
-    res.send(`MAGIC LOGIN TBD: ${zcap}`)
+    const delegatedCapability = zcap.verifyZcapInvocation(req.query.zcap);
+
+    const zauthCap = options.zcapAuthenticationCapabilities.find(zauthCap =>
+      zauthCap.id === delegatedCapability.parentCapabilityId
+    )
+    const { email } = delegatedCapability.zcap.pii
+    const did = delegatedCapability.invoker
+    // res.json({ zauthCap, delegatedCapability })
+
+    const sessionJwt = jwt.sign({ email, did }, SESSION_SECRET, { expiresIn: 86400 });
+    res
+      .status(200)
+      .cookie(COOKIE_NAME, sessionJwt)
+      .redirect('/')
+
+
     // TODO login magic
     // res.redirect('/')
   })

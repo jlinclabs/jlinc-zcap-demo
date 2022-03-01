@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>{{title}}</title>
+    <link type="text/css" rel="stylesheet" href="bootstrap/css/bootstrap.css"/>
+    <link type="text/css" rel="stylesheet" href="/index.css"/>
+    <script type="application/javascript" src="/bootstrap/js/bootstrap.js"></script>
+  </head>
+  <body style="--app-color: {{app.color}}; background-color: var(--app-color);">
+    <div class="container">
+      <a href="/"><h1>{{app.name}}</h1></a>
+      {{{body}}}
+    </div>
+  </body>
+</html>

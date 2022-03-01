@@ -3,9 +3,9 @@
   <head>
     <title>{{title}}</title>
     <link type="text/css" rel="stylesheet" href="/almond.css"/>
-    <link type="text/css" rel="stylesheet" href="/index.css"/>
     <style>
       :root {
+        --primaryL: 30%;
         --app-color: {{app.color}};
       }
       html {
@@ -15,7 +15,7 @@
   </head>
   <body>
     <div class="container">
-      <h1><a href="/" class="home-link"> </a> {{app.name}}</h1>
+      <h1>{{app.name}}</h1>
 
       <ul>
         <li><a href="/">home</a></li>
@@ -32,13 +32,13 @@
 
 
       {{#if session}}
-        <h4>Logged in as:</h4>
+        <h5>Logged in as:</h5>
         <dl>
           <dt>DID</dt><dd>{{session.did}}</dd>
           <dt>Email</dt><dd>{{session.email}}</dd>
         </dl>
       {{else}}
-        <h4>Not Logged in</h4>
+        <h5>Not Logged in</h5>
       {{/if}}
       {{{body}}}
     </div>

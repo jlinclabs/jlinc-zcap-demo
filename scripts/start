@@ -1,21 +1,18 @@
 #!/usr/bin/env node
 
+const Path = require('path')
 const http = require('http')
 const { createApp } = require('../app')
-const zcap = require('@jlinc/zcap')
 
-const Apps = [
-  require('../apps/CatWalkers'),
-  require('../apps/BadBirders'),
-  require('../apps/DopeDogs'),
-]
-
-const apps = []
-for (const options of Apps) {
-  const app = createApp(options)
-  apps.push(app)
-  app.start(error => {
-    if (error) console.error(error)
-    else console.log(`${app.name} ${app.url}`)
-  })
+const configPath = Path.resolve(process.argv[2] || '../config.json')
+if (!configPath) {
+  console.error(`configPath=${configPath}`)
+  process.exit(1)
 }
+const config = require(configPath)
+
+const app = createApp(config)
+app.start(error => {
+  if (error) console.error(error)
+  else console.log(`${app.name} ${app.url}`)
+})

@@ -11,7 +11,6 @@ hbs.handlebars.registerHelper('toJSON', object =>
 )
 
 function createApp(options){
-  console.log('CREATE APP', options)
   const appName = options.name
   const app = express()
   // Object.assign(app, options)

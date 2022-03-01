@@ -4,7 +4,7 @@
   "version": "1.0.0",
   "scripts": {
     "start": "./scripts/start",
-    "start:dev": "nodemon --exec 'npm start'"
+    "start:dev": "nodemon -w . --exec ./scripts/start-dev"
   },
   "keywords": [],
   "repository": {
@@ -26,5 +26,8 @@
     "express": "^4.17.3",
     "express-hbs": "^2.4.0",
     "jsonwebtoken": "^8.5.1"
+  },
+  "devDependencies": {
+    "concurrently": "^7.0.0"
   }
 }

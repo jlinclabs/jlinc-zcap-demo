@@ -1,0 +1,7 @@
+#!/usr/bin/env bash
+
+./node_modules/.bin/concurrently --kill-others-on-fail \
+  --names "CatWalkers,BadBirders,DopeDogs" \
+  "./scripts/start ./apps/CatWalkers.json" \
+  "./scripts/start ./apps/BadBirders.json" \
+  "./scripts/start ./apps/DopeDogs.json"

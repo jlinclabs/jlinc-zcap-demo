@@ -68,3 +68,8 @@ artifacts
 
 # VSCode
 .ignore
+dev/apps/*/tmp
+dev/apps/bad-birders/tmp
+dev/apps/cat-walkers/tmp
+dev/apps/dope-dogs/tmp
+

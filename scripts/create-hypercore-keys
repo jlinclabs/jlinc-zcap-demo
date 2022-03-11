@@ -1,0 +1,8 @@
+#!/usr/bin/env node
+
+const crypto = require('hypercore-crypto')
+const { secretKey, publicKey } = crypto.keyPair()
+console.log(JSON.stringify({
+  publicKey: publicKey.toString('hex'),
+  secretKey: secretKey.toString('hex'),
+}, null, 2))

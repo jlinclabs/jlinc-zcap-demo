@@ -1,19 +1,7 @@
-#!/usr/bin/env node
+#!/usr/bin/env bash
 
-const { createApp } = require('../app')
-
-const Apps = [
-  require('../dev/apps/CatWalkers'),
-  require('../dev/apps/BadBirders'),
-  require('../dev/apps/DopeDogs'),
-]
-
-const apps = []
-for (const options of Apps) {
-  const app = createApp(options)
-  apps.push(app)
-  app.start(error => {
-    if (error) console.error(error)
-    else console.log(`${app.name} ${app.url}`)
-  })
-}
+concurrently \
+  --names "cat-walkers,bad-birders,dope-dogs" \
+  "./scripts/start ./dev/apps/cat-walkers" \
+  "./scripts/start ./dev/apps/bad-birders" \
+  "./scripts/start ./dev/apps/dope-dogs"

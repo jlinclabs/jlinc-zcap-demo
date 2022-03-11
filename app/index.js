@@ -1,10 +1,12 @@
 const express = require('express')
+const Router = require("express-promise-router");
 const bodyParser = require('body-parser')
 const cookieParser = require('cookie-parser')
 const hbs = require('express-hbs')
 const jwt = require('jsonwebtoken')
 const zcap = require('@jlinc/zcap')
 const parseUrl = require('url').parse
+const { HypercoreLog } = require('./hypercore')
 
 hbs.handlebars.registerHelper('toJSON', object =>
   new hbs.handlebars.SafeString(JSON.stringify(object), null, 2)
@@ -39,8 +41,25 @@ function createApp(options){
   const SESSION_SECRET = `dont tell anyone this is ${appName}`
   const COOKIE_NAME = `session`
 
+  const ourHypercoreLog = new HypercoreLog(options.hypercoreKeys.publicKey, {
+    writable: true,
+    secretKey: options.hypercoreKeys.secretKey,
+  })
+  ourHypercoreLog.append({ appName, appStart: Date.now() })
+
+  const hypercorePartners = options.hypercorePartners.map(partner => {
+    return {
+      ...partner,
+      hypercore: new HypercoreLog(partner.publicKey, {
+        sparse: true,
+      }),
+    }
+  })
+
   // ROUTES
-  app.use('*', (req, res, next) => {
+  const router = Router()
+  app.use(router)
+  router.use('*', (req, res, next) => {
     const sessionJwt = req.cookies[COOKIE_NAME]
     const setSession = (error, session) => {
       if (error) res.cookie('session', null)
@@ -51,15 +70,39 @@ function createApp(options){
     else setSession()
   })
 
-  app.get('/', (req, res) => {
-    res.render('index')
+  router.get('/', async (req, res) => {
+    const partners = await Promise.all(
+      hypercorePartners.map(async partner => {
+        return {
+          name: partner.name,
+          length: partner.length,
+          entires: await partner.hypercore.all(),
+        }
+      })
+    )
+    res.render('index', {
+      hypercoreInfo: JSON.stringify({
+        ourLog: {
+          length: ourHypercoreLog.length,
+          entries: await ourHypercoreLog.all(),
+        },
+        partners,
+      }, null, 2),
+      // length: alphaLog.length,
+      // length: alphaLog.length,
+      // entries: [
+      //   await hypercore.alpha.get(0),
+      //   await hypercore.alpha.get(1),
+      //   await hypercore.alpha.get(2),
+      // ]
+    })
   })
 
-  app.get('/login', (req, res) => {
+  router.get('/login', (req, res) => {
     res.render('login')
   })
 
-  app.post('/login', (req, res) => {
+  router.post('/login', (req, res) => {
     const { email, password } = req.body
     let session
     for (const user of options.users){
@@ -83,11 +126,11 @@ function createApp(options){
     }
   })
 
-  app.post('/logout', (req, res) => {
+  router.post('/logout', (req, res) => {
     res.status(200).clearCookie(COOKIE_NAME).redirect('/')
   })
 
-  app.get('/send-me-to', (req, res) => {
+  router.get('/send-me-to', (req, res) => {
     const { email } = res.locals.session
     const appUrl = req.query.app
     const user = options.users.find(user => user.email === email)
@@ -98,6 +141,7 @@ function createApp(options){
     )
     if (!capability) throw new Error(`cant find capability`)
 
+    // signed by the user identity
     const delegatedCapability = zcap.delegate(
       user.zcapIdentity,
       capability.id,
@@ -106,6 +150,7 @@ function createApp(options){
       { email },
     );
 
+    // signed by the server identity
     const jwt = zcap.invokeDelegable(
       user.zcapIdentity,
       delegatedCapability,
@@ -114,7 +159,7 @@ function createApp(options){
     res.redirect(`${capability.targetUri}?zcap=${jwt}`)
   })
 
-  app.get('/zcap-login', (req, res) => {
+  router.get('/zcap-login', (req, res) => {
     const delegatedCapability = zcap.verifyZcapInvocation(req.query.zcap);
 
     const zauthCap = options.zcapAuthenticationCapabilities.find(zauthCap =>
@@ -122,6 +167,14 @@ function createApp(options){
     )
     const { email } = delegatedCapability.zcap.pii
     const did = delegatedCapability.invoker
+
+    // query for existing user for did
+    // if !exists
+    //    insert user record here
+    //        associated with did
+    //
+    // login as user
+
     // res.json({ zauthCap, delegatedCapability })
 
     const sessionJwt = jwt.sign({ email, did }, SESSION_SECRET, { expiresIn: 86400 });

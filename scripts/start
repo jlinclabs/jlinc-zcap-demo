@@ -2,15 +2,23 @@
 
 const Path = require('path')
 const http = require('http')
-const { createApp } = require('../app')
 
-const configPath = Path.resolve(process.argv[2] || 'config.json')
-if (!configPath) {
-  console.error(`configPath=${configPath}`)
+const appDirectory = Path.resolve(process.argv[2])
+if (!appDirectory){
+  console.error(`app directory required`)
   process.exit(1)
 }
+console.log(`appDirectory=${appDirectory}`)
+process.chdir(appDirectory)
+console.log(`cwd=${process.cwd()}`)
+
+// fs.existsSync(appDirectory)
+
+const configPath = Path.resolve(appDirectory + '/config.json')
+console.log(`configPath=${configPath}`)
 
 const config = require(configPath)
+const { createApp } = require('../app')
 if (process.env.PORT) config.port = process.env.PORT
 const app = createApp(config)
 app.start(error => {

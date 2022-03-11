@@ -4,6 +4,22 @@
   "port": 4000,
   "url": "https://cat-walkers.zcap.test",
   "databaseUrl": "postgresql://localhost/zcap-demo-cat-walkers",
+  "hypercoreKeys": {
+    "publicKey": "e4c0d54d09b3f0842fa403b73d220b829bda989cb03efb37eedefb37d2cde5fe",
+    "secretKey": "46e982fe19e056039c20db64af4e1ce29344aba2c41745d480c68c7f2c5b6660e4c0d54d09b3f0842fa403b73d220b829bda989cb03efb37eedefb37d2cde5fe"
+  },
+  "hypercorePartners": [
+    {
+      "name": "bad-birders",
+      "origin": "https://bad-birders.zcap.test",
+      "publicKey": "01a8cd697302f406cb77f9276c270b27dd6c7d4717c68872ea219f9fe4d690d6"
+    },
+    {
+      "name": "dope-dogs",
+      "origin": "https://dope-dogs.zcap.test",
+      "publicKey": "67dd51a8828e08dc621360a085ba74966c7b2adb178ae610c3f904706f827364"
+    }
+  ],
   "users": [
     {
       "email": "alice@example.com",

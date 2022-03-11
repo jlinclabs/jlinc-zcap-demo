@@ -4,8 +4,6 @@ const { toPromises } = require('hypercore-promisifier')
 
 const TMP_PATH = Path.resolve(process.cwd(), 'tmp')
 
-console.log('HUYPERCORE TEMP PATH', TMP_PATH)
-
 class HypercoreLog {
   constructor(publicKey, options){
     this.directory = TMP_PATH + '/' + publicKey

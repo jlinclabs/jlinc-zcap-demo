@@ -75,7 +75,8 @@ function createApp(options){
       hypercorePartners.map(async partner => {
         return {
           name: partner.name,
-          length: partner.length,
+          coreLength: partner.hypercore.core.length,
+          beeLength: partner.hypercore.bee.length,
           entires: await partner.hypercore.all(),
         }
       })
@@ -84,17 +85,10 @@ function createApp(options){
       hypercoreInfo: JSON.stringify({
         ourLog: {
           length: ourHypercoreLog.length,
-          entries: await ourHypercoreLog.all(),
+          // entries: await ourHypercoreLog.all(),
         },
         partners,
       }, null, 2),
-      // length: alphaLog.length,
-      // length: alphaLog.length,
-      // entries: [
-      //   await hypercore.alpha.get(0),
-      //   await hypercore.alpha.get(1),
-      //   await hypercore.alpha.get(2),
-      // ]
     })
   })
 

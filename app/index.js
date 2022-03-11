@@ -48,12 +48,12 @@ function createApp(options){
   ourHypercoreLog.append({ appName, appStart: Date.now() })
 
   const hypercorePartners = options.hypercorePartners.map(partner => {
-    return {
-      ...partner,
-      hypercore: new HypercoreLog(partner.publicKey, {
-        sparse: true,
-      }),
-    }
+    const hypercore = new HypercoreLog(partner.publicKey, {
+      sparse: true,
+      writable: false,
+    })
+    hypercore.core.replicate(false)
+    return { ...partner, hypercore }
   })
 
   // ROUTES

@@ -4,12 +4,11 @@ const bodyParser = require('body-parser')
 const cookieParser = require('cookie-parser')
 const hbs = require('express-hbs')
 const jwt = require('jsonwebtoken')
-const { Pool: PGPool } = require('pg')
-
-
 const zcap = require('@jlinc/zcap')
 const parseUrl = require('url').parse
 // const { HypercoreLog } = require('./hypercore')
+
+const Database = require('./database')
 
 hbs.handlebars.registerHelper('toJSON', object =>
   new hbs.handlebars.SafeString(JSON.stringify(object), null, 2)
@@ -17,14 +16,13 @@ hbs.handlebars.registerHelper('toJSON', object =>
 
 function createApp(options){
   const appName = options.name
-  const pg = new PGPool({
-    connectionString: options.postgresDatabaseUrl,
-  })
 
   const app = express()
   // Object.assign(app, options)
   app.port = options.port
   app.url = options.url
+  app.db = new Database(options.postgresDatabaseUrl)
+
   app.use(express.static(__dirname + '/public'));
   app.use(bodyParser.urlencoded({ extended: false }))
   app.use(bodyParser.json({ }))
@@ -51,18 +49,26 @@ function createApp(options){
   // ROUTES
   const router = Router()
   app.use(router)
-  router.use('*', (req, res, next) => {
+  router.use('*', async (req, res, next) => {
     // pg.connect((error, client, done)
-
+    // await pg.connect()
 
     const sessionJwt = req.cookies[COOKIE_NAME]
-    const setSession = (error, session) => {
-      if (error) res.cookie('session', null)
-      res.locals.session = session
-      next()
+    if (sessionJwt) {
+      await new Promise((resolve, reject) => {
+        jwt.verify(sessionJwt, SESSION_SECRET, (error, session) => {
+          if (error){
+            if (error) res.cookie('session', null)
+          }else{
+            res.locals.session = session
+          }
+        })
+      })
     }
-    if (sessionJwt) jwt.verify(sessionJwt, SESSION_SECRET, setSession)
-    else setSession()
+
+    const users = await app.db.getUsers()
+    res.locals.users = users
+    next()
   })
 
   router.get('/', async (req, res) => {

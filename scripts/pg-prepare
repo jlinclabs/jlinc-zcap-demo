@@ -1,13 +1,24 @@
 #!/usr/bin/env node
 
+
 const getApp = require('../lib/getApp')
+
 
 const app = getApp(process.argv[2] || '.')
 if (!app){
   console.error(`app not found`)
   process.exit(1)
 }
-console.log(app)
+
+async function main(){
+
+  const schema = await readFile(SCHEMA_PATH)
+  await app.pg.query(`${schema}`)
+}
+main().then(
+  () => { process.exit(0) },
+  error => { console.error(error); process.exit(1) },
+)
 
 // const app = createApp(config)
 // app.start(error => {

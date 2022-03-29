@@ -2,6 +2,12 @@
 
 concurrently \
   --names "cat-walkers,bad-birders,dope-dogs" \
+  "rm -rf ./dev/apps/cat-walkers/hyperlinc" \
+  "rm -rf ./dev/apps/bad-birders/hyperlinc" \
+  "rm -rf ./dev/apps/dope-dogs/hyperlinc"
+
+concurrently \
+  --names "cat-walkers,bad-birders,dope-dogs" \
   "./scripts/pg-prepare ./dev/apps/cat-walkers" \
   "./scripts/pg-prepare ./dev/apps/bad-birders" \
   "./scripts/pg-prepare ./dev/apps/dope-dogs"

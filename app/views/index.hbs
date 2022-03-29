@@ -27,6 +27,7 @@
     <p>
       <label for="login-input-username">Signup</label><br/>
       <input required id="login-input-username"
+        pattern="[a-z]{1}[a-z0-9]{3,20}"
         type="text" name="username" placeholder="username" />
       <input required type="text" name="realname" placeholder="realname" />
       <button type="submit" class="btn btn-primary">SIGNUP</button>
@@ -53,10 +54,16 @@
 <h5>Users</h5>
 <ul>
   {{#each users}}
-    <li>@{{username}}</li>
+    <li>
+      @{{username}} -
+      {{realname}} -
+      <form method="post" action="/login" style="display: inline">
+        <input type="hidden" name="username" value="{{username}}"/>
+        <a href="/login" onclick="this.parentElement.submit(); return false">login-as</a>
+      </form>
+
+    </li>
   {{else}}
     <i>no users :(</i>
   {{/each}}
 </ul>
-
-<hr/>

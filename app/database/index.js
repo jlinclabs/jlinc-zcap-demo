@@ -28,12 +28,11 @@ module.exports = class Database {
   }
 
   async createUser({ username, realname }){
-    const x = await this.pg.query(
+    const { rows: [ user ] } = await this.pg.query(
       `INSERT INTO users(username, realname) VALUES($1, $2) RETURNING *`,
       [username, realname]
     )
-    console.log(x)
-    return await this.getUser(username)
+    return user
   }
 
 }

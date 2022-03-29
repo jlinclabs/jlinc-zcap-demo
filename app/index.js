@@ -72,7 +72,7 @@ function createApp(options){
 
   router.get('/', async (req, res) => {
     res.render('index', {
-      // users: await app.db.getAllUsers(),
+      users: await app.db.getAllUsers(),
     })
   })
 

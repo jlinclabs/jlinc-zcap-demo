@@ -65,7 +65,7 @@ class Users {
     return await this.get(username)
   }
 
-  async updateProfile(username, { realname }){
+  async _getHyperlinkIdentity(username){
     const {
       hyperlink_id: id,
       hyperlink_secret_key: secretKey,
@@ -81,8 +81,12 @@ class Users {
       `,
       [username]
     )
-    const hlIdentity = await this.hl.getIdentity(id, secretKey)
-    await hlIdentity.patchProfile({ realname })
+    return await this.hl.getIdentity(id, secretKey)
+  }
+
+  async updateProfile(username, changes){
+    const hlIdentity = await this._getHyperlinkIdentity(username)
+    await hlIdentity.patchProfile(changes)
   }
 
 }

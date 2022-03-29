@@ -3,14 +3,43 @@
 <pre><code>{{toJSON user}}</code></pre>
 
 {{#if user}}
-  <dl>
-    <dt>Real Name:</dt>
-    <dd>{{user.realname}}</dd>
-    <dt>Email:</dt>
-    <dd>{{user.email}}</dd>
-    <dt>Created:</dt>
-    <dd>{{user.created_at}}</dd>
-  </dl>
+  {{#if itsUs}}
+    <form method="post" action="/profile">
+      <p>
+        <label for="realname-input">Real Name</label><br/>
+        <input
+          required
+          id="realname-input"
+          type="text"
+          name="realname"
+          value="{{currentUser.realname}}"
+          placeholder="Beth Smith"
+        />
+      </p>
+      <p>
+        <label for="email-input">Email</label><br/>
+        <input
+          id="email-input"
+          type="email"
+          name="email"
+          value="{{currentUser.email}}"
+          placeholder="you@example.com"
+        />
+      </p>
+      <p>
+        <button type="submit" class="btn btn-primary">UPDATE</button>
+      </p>
+    </form>
+  {{else}}
+    <dl>
+      <dt>Real Name:</dt>
+      <dd>{{user.realname}}</dd>
+      <dt>Email:</dt>
+      <dd>{{user.email}}</dd>
+      <dt>Created:</dt>
+      <dd>{{user.created_at}}</dd>
+    </dl>
+  {{/if}}
 {{else}}
   <i>user not found</i>
 {{/if}}

@@ -122,21 +122,20 @@ function createApp(options){
     createSessionCookie(res, user.username)
   })
 
+  router.get('/@:username', async (req, res) => {
+    const { currentUser } = res.locals
+    const { username } = req.params
+    const itsUs = currentUser && currentUser.username === username
+    const user = itsUs ? currentUser : (await app.users.get(username))
+    res.render('profile', { username, itsUs, user })
+  })
+
   router.post('/profile', async (req, res) => {
     const { currentUser } = res.locals
-    const { realname } = req.body
-    await app.users.updateProfile(currentUser.username, { realname })
+    const changes = req.body
+    await app.users.updateProfile(currentUser.username, changes)
     res.redirect('/')
   })
-
-  router.get('/@:username', async (req, res) => {
-    const { username } = req.params
-    res.render('profile', {
-      username,
-      user: await app.users.get(username),
-    })
-  })
-
 
   router.get('/send-me-to', (req, res) => {
     const { email } = res.locals.session

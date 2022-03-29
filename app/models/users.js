@@ -2,9 +2,10 @@ module.exports = app => new Users(app)
 
 class Users {
 
-  constructor({ pg, hl }){
+  constructor({ url, pg, hl }){
     this.pg = pg
     this.hl = hl
+    this.appUrl = url
   }
 
   async getAll(){
@@ -19,7 +20,7 @@ class Users {
       `SELECT * FROM users WHERE username = $1`,
       [username],
     )
-    await this._loadHyperlinkProfiles([user])
+    if (user) await this._loadHyperlinkProfiles([user])
     return user
   }
 
@@ -38,12 +39,16 @@ class Users {
     if (await this.get(username))
       throw new Error(`"${username}" is taken`)
 
-    const hlIdentity = this.hl.createIdentity()
+    const hlIdentity = await this.hl.createIdentity({
+      appUrl: this.appUrl,
+    })
+
+    await hlIdentity.patchProfile({ realname })
 
     const user = await this.pg.one(
       `
       INSERT INTO users(username, hyperlink_id)
-      VALUES($1, $2, $3)
+      VALUES($1, $2)
       RETURNING *
       `,
       [username, hlIdentity.id]
@@ -57,10 +62,10 @@ class Users {
       `,
       [hlIdentity.id, hlIdentity.secretKey]
     )
-    // create hypercores
-    // append inital message
-    // append profile update declairing realname
-    return user
+
+
+
+    return await this.get(username)
   }
 
 }

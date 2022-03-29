@@ -8,6 +8,7 @@ module.exports = class Users {
   async getAll(){
     const users = await this.pg.query('SELECT * FROM users')
     await this._loadHyperlinkProfiles(users)
+    console.log('users!!', users)
     return users
   }
 
@@ -21,28 +22,21 @@ module.exports = class Users {
   }
 
   async _loadHyperlinkProfiles(users){
-    const hlIdentities = await this.hl.getIdentities(
+    const profiles = await this.hl.getProfiles(
       users.map(u => u.hyperlink_id)
     )
     users.forEach((user, index) => {
-      const hlIdentity = hlIdentities[index]
-      if (hlIdentity.id !== user.hyperlink_id)
-        throw new Error(`id mismatch?`)
-
-      // load data from hyperlinc profile
-      Object.assign(user, {
-        realName,
-        email,
-      })
+      const profile = profiles[index]
+      const { realname, email } = profile
+      Object.assign(user, { realname, email })
     })
-    // get user profiles from hypercores
   }
 
   async create({ username, realname }){
     if (await this.get(username))
       throw new Error(`"${username}" is taken`)
 
-    const hlIdentity = await this.hl.createIdentity()
+    const hlIdentity = this.hl.createIdentity()
 
     const user = await this.pg.one(
       `

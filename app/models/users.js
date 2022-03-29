@@ -89,6 +89,12 @@ class Users {
     await hlIdentity.patchProfile(changes)
   }
 
+  async getProfileEvents(username){
+    const hlIdentity = await this._getHyperlinkIdentity(username)
+    await hlIdentity.update()
+    return await hlIdentity.getEventsForType('patchProfile')
+  }
+
 }
 
 

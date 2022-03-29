@@ -40,6 +40,12 @@
       <dd>{{user.created_at}}</dd>
     </dl>
   {{/if}}
+
+  <h4>Profile Events</h4>
+  {{#each profileEvents}}
+    {{toJSON this}}
+  {{/each}}
+
 {{else}}
   <i>user not found</i>
 {{/if}}

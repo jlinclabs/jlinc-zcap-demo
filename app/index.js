@@ -127,7 +127,11 @@ function createApp(options){
     const { username } = req.params
     const itsUs = currentUser && currentUser.username === username
     const user = itsUs ? currentUser : (await app.users.get(username))
-    res.render('profile', { username, itsUs, user })
+    const profileEvents = user && await app.users.getProfileEvents(username)
+    console.log({ profileEvents })
+    res.render('profile', {
+      username, itsUs, user, profileEvents
+    })
   })
 
   router.post('/profile', async (req, res) => {

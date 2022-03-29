@@ -42,11 +42,11 @@ class Users {
 
     const user = await this.pg.one(
       `
-      INSERT INTO users(username, hyperlink_id, hyperlink_public_key)
+      INSERT INTO users(username, hyperlink_id)
       VALUES($1, $2, $3)
       RETURNING *
       `,
-      [username, hlIdentity.id, hlIdentity.publicKey]
+      [username, hlIdentity.id]
     )
     if (!user) throw new Error(`failed to insert user`)
 
@@ -55,7 +55,7 @@ class Users {
       INSERT INTO hyperlinc_secret_keys
       VALUES($1, $2) RETURNING *
       `,
-      [hlIdentity.publicKey, hlIdentity.secretKey]
+      [hlIdentity.id, hlIdentity.secretKey]
     )
     // create hypercores
     // append inital message

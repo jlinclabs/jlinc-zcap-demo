@@ -1,4 +1,6 @@
-module.exports = class Users {
+module.exports = app => new Users(app)
+
+class Users {
 
   constructor({ pg, hl }){
     this.pg = pg

@@ -7,10 +7,6 @@ const jwt = require('jsonwebtoken')
 const zcap = require('@jlinc/zcap')
 const parseUrl = require('url').parse
 
-// const Postgresql = require('./postgresql')
-// const Hyperlinc = require('./hyperlinc')
-const Users = require('./models/users')
-
 hbs.handlebars.registerHelper('toJSON', object =>
   new hbs.handlebars.SafeString(JSON.stringify(object), null, 2)
 )
@@ -23,9 +19,7 @@ function createApp(options){
   app.url = options.url
   app.pg = require('./postgresql')(options)
   app.hl = require('./hyperlinc')(options)
-  // app.pg = new Postgresql(options.postgresDatabaseUrl)
-  // app.hl = new Hyperlinc(options.appDirectory)
-  app.users = new Users({ pg: app.pg, hl: app.hl })
+  app.users = require('./models/users')(app)
 
   app.use(express.static(__dirname + '/public'));
   app.use(bodyParser.urlencoded({ extended: false }))
@@ -40,13 +34,6 @@ function createApp(options){
   Object.assign(app.locals, {
     appName,
     appColor: options.color,
-    // app: options,
-    // partnerApps: options.zcapCapabilities.map(zc => {
-    //   let url = parseUrl(zc.targetUri)
-    //   url = `${url.protocol}//${url.host}`
-    //   const name = url
-    //   return { name, url }
-    // })
   })
 
   const SESSION_SECRET = `dont tell anyone this is ${appName}`

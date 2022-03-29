@@ -32,11 +32,7 @@
 
 
       {{#if session}}
-        <h5>Logged in as:</h5>
-        <dl>
-          <dt>DID</dt><dd>{{session.did}}</dd>
-          <dt>Email</dt><dd>{{session.email}}</dd>
-        </dl>
+        <h5>Logged in as: {{session.username}}</h5>
       {{else}}
         <h5>Not Logged in</h5>
       {{/if}}

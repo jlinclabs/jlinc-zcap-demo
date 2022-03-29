@@ -4,6 +4,7 @@ DROP TABLE IF EXISTS did_documents;
 CREATE TABLE users(
   created_at TIMESTAMP DEFAULT now() NOT NULL,
   username TEXT PRIMARY KEY,
+  realname TEXT NOT NULL,
   did TEXT UNIQUE
 );
 

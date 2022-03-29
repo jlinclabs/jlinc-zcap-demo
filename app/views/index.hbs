@@ -1,5 +1,6 @@
 
-<textarea style="width: 100vw; height: 100vh;">{{hypercoreInfo}}</textarea>
+{{!-- <textarea style="width: 100vw; height: 100vh;">{{debug}}</textarea> --}}
+
 
 <h5>Other Apps</h5>
 <ul>
@@ -13,3 +14,37 @@
     </li>
   {{/each}}
 </ul>
+
+<h5>Users</h5>
+<ul>
+  {{#each users}}
+    <li>{{username}}</li>
+  {{else}}
+    <i>no users :(</i>
+  {{/each}}
+</ul>
+
+<hr/>
+
+<h3>become someone</h3>
+
+<form method="post" action="/login">
+  <p>
+    <label for="login-input-username">Login</label><br/>
+    <input required
+      id="login-input-username" type="text" name="username"
+      placeholder="username"
+    />
+    <button type="submit" class="btn btn-primary">LOGIN</button>
+  </p>
+</form>
+
+<form method="post" action="/signup">
+  <p>
+    <label for="login-input-username">Signup</label><br/>
+    <input required id="login-input-username"
+      type="text" name="username" placeholder="username" />
+    <input required type="text" name="realname" placeholder="realname" />
+    <button type="submit" class="btn btn-primary">SIGNUP</button>
+  </p>
+</form>

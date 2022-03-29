@@ -62,34 +62,17 @@ function createApp(options){
           }else{
             res.locals.session = session
           }
+          resolve()
         })
       })
     }
 
-    const users = await app.db.getUsers()
-    res.locals.users = users
     next()
   })
 
   router.get('/', async (req, res) => {
-    // const partners = await Promise.all(
-    //   hypercorePartners.map(async partner => {
-    //     return {
-    //       name: partner.name,
-    //       coreLength: partner.hypercore.core.length,
-    //       beeLength: partner.hypercore.bee.length,
-    //       entires: await partner.hypercore.all(),
-    //     }
-    //   })
-    // )
     res.render('index', {
-      hypercoreInfo: JSON.stringify({
-        // ourLog: {
-        //   // length: ourHypercoreLog.length,
-        //   // entries: await ourHypercoreLog.all(),
-        // },
-        // partners,
-      }, null, 2),
+      // users: await app.db.getAllUsers(),
     })
   })
 
@@ -97,32 +80,37 @@ function createApp(options){
     res.render('login')
   })
 
-  router.post('/login', (req, res) => {
-    const { email, password } = req.body
-    let session
-    for (const user of options.users){
-      if (user.email === email && user.password === password){
-        session = { email, did: user.zcapIdentity.did }
-      }
-    }
-    if (session){
-      const sessionJwt = jwt.sign(session, SESSION_SECRET, { expiresIn: 86400 });
-      res
-        .status(200)
-        .cookie(COOKIE_NAME, sessionJwt)
-        .redirect('/')
+  const createSessionCookie = (res, username) =>
+    res
+      .cookie(COOKIE_NAME, jwt.sign(
+        { username },
+        SESSION_SECRET,
+        { expiresIn: 86400 }
+      ))
+      .redirect('/')
+
+  router.post('/login', async (req, res) => {
+    const { username } = req.body
+    const user = await app.db.getUser({ username })
+    if (user) {
+      createSessionCookie(res, user.username)
     }else{
       res
-        .status(200)
         .clearCookie(COOKIE_NAME)
         .render('error', {
-          error: { message: 'bad username or password' },
+          error: { message: `user "${username}" not found :(` },
         })
     }
   })
 
   router.post('/logout', (req, res) => {
     res.status(200).clearCookie(COOKIE_NAME).redirect('/')
+  })
+
+  router.post('/signup', async (req, res) => {
+    const { username, realname } = req.body
+    const user = await app.db.createUser({ username, realname })
+    createSessionCookie(res, user.username)
   })
 
   router.get('/send-me-to', (req, res) => {

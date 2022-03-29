@@ -9,13 +9,35 @@ module.exports = class Database {
     this.pg = new PGPool({ connectionString })
   }
 
-  async loadSchema(){
+  async reset(){
     const schema = await readFile(SCHEMA_PATH)
-    await app.pg.query(`${schema}`)
+    await this.pg.query(`${schema}`)
   }
 
-  async getUsers(){
-    await this.pg.query('SELECT * FROM users')
+  async getAllUsers(){
+    const { rows: users } = await this.pg.query('SELECT * FROM users')
+    return users
   }
+
+  async getUser(username){
+    console.log(await this.getAllUsers())
+    console.log({ username })
+    const result = await this.pg.query({
+      text: `SELECT * FROM users WHERE username = 'jared' LIMIT 1`,
+      // values: [username],
+    })
+    console.log(result)
+    return result.rows[0]
+  }
+
+  async createUser({ username, realname }){
+    const x = await this.pg.query(
+      `INSERT INTO users(username, realname) VALUES($1, $2) RETURNING *`,
+      [username, realname]
+    )
+    console.log(x)
+    return await this.getUser(username)
+  }
+
 }
 

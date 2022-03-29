@@ -11,9 +11,7 @@ if (!app){
 }
 
 async function main(){
-
-  const schema = await readFile(SCHEMA_PATH)
-  await app.pg.query(`${schema}`)
+  await app.db.reset()
 }
 main().then(
   () => { process.exit(0) },

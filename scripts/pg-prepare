@@ -9,7 +9,7 @@ if (!app){
 }
 
 async function main(){
-  await app.pg.reset()
+  await app.pg.resetSchema()
 }
 main().then(
   () => { process.exit(0) },

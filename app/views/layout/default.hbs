@@ -16,26 +16,6 @@
   <body>
     <div class="container">
       <h1>{{app.name}}</h1>
-
-      <ul>
-        <li><a href="/">home</a></li>
-        {{#if session}}
-          <li>
-            <form method="post" action="/logout">
-              <a href="/logout" onclick="this.parentElement.submit(); return false">logout</a>
-            </form>
-          </li>
-        {{else}}
-          <li><a href="/login">login</a></li>
-        {{/if}}
-      </ul>
-
-
-      {{#if session}}
-        <h5>Logged in as: {{session.username}}</h5>
-      {{else}}
-        <h5>Not Logged in</h5>
-      {{/if}}
       {{{body}}}
     </div>
   </body>

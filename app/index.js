@@ -91,14 +91,14 @@ function createApp(options){
 
   router.post('/login', async (req, res) => {
     const { username } = req.body
-    const user = await app.db.getUser({ username })
+    const user = await app.db.getUser(username)
     if (user) {
       createSessionCookie(res, user.username)
     }else{
       res
         .clearCookie(COOKIE_NAME)
         .render('error', {
-          error: { message: `user "${username}" not found :(` },
+          error: { message: `user "${username}" not found` },
         })
     }
   })

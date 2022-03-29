@@ -20,14 +20,11 @@ module.exports = class Database {
   }
 
   async getUser(username){
-    console.log(await this.getAllUsers())
-    console.log({ username })
-    const result = await this.pg.query({
-      text: `SELECT * FROM users WHERE username = 'jared' LIMIT 1`,
-      // values: [username],
-    })
-    console.log(result)
-    return result.rows[0]
+    const { rows: [ user ] } = await this.pg.query(
+      `SELECT * FROM users WHERE username = $1`,
+      [username],
+    )
+    return user
   }
 
   async createUser({ username, realname }){

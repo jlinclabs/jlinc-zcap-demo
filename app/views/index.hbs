@@ -2,6 +2,41 @@
 {{!-- <textarea style="width: 100vw; height: 100vh;">{{debug}}</textarea> --}}
 
 
+
+{{#if session}}
+  <h2>Welcome back @{{session.username}}</h2>
+  {{!-- <h5>Logged in as: {{session.username}}</h5> --}}
+  <form method="post" action="/logout">
+    <a href="/logout" onclick="this.parentElement.submit(); return false">logout</a>
+  </form>
+{{else}}
+  <h5>Welcome New User</h5>
+
+  <form method="post" action="/login">
+    <p>
+      <label for="login-input-username">Login</label><br/>
+      <input required
+        id="login-input-username" type="text" name="username"
+        placeholder="username"
+      />
+      <button type="submit" class="btn btn-primary">LOGIN</button>
+    </p>
+  </form>
+
+  <form method="post" action="/signup">
+    <p>
+      <label for="login-input-username">Signup</label><br/>
+      <input required id="login-input-username"
+        type="text" name="username" placeholder="username" />
+      <input required type="text" name="realname" placeholder="realname" />
+      <button type="submit" class="btn btn-primary">SIGNUP</button>
+    </p>
+  </form>
+
+{{/if}}
+
+<hr/>
+
 <h5>Other Apps</h5>
 <ul>
   {{#each partnerApps}}
@@ -18,33 +53,10 @@
 <h5>Users</h5>
 <ul>
   {{#each users}}
-    <li>{{username}}</li>
+    <li>@{{username}}</li>
   {{else}}
     <i>no users :(</i>
   {{/each}}
 </ul>
 
 <hr/>
-
-<h3>become someone</h3>
-
-<form method="post" action="/login">
-  <p>
-    <label for="login-input-username">Login</label><br/>
-    <input required
-      id="login-input-username" type="text" name="username"
-      placeholder="username"
-    />
-    <button type="submit" class="btn btn-primary">LOGIN</button>
-  </p>
-</form>
-
-<form method="post" action="/signup">
-  <p>
-    <label for="login-input-username">Signup</label><br/>
-    <input required id="login-input-username"
-      type="text" name="username" placeholder="username" />
-    <input required type="text" name="realname" placeholder="realname" />
-    <button type="submit" class="btn btn-primary">SIGNUP</button>
-  </p>
-</form>

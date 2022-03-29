@@ -133,6 +133,16 @@ function createApp(options){
     })
   })
 
+  router.get('/__hyperlinc/:id', async (req, res) => {
+    const { id } = req.params
+    const identity = await app.hl.getIdentity(id)
+    await identity.update()
+    const hyperlincEvents = await identity.getAllEvents()
+    res.render('hyperlinc_events', {
+      hyperlincEvents
+    })
+  })
+
   router.post('/profile', async (req, res) => {
     const { username } = res.locals.currentUser
     const changes = req.body

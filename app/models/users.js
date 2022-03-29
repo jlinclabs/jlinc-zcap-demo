@@ -11,7 +11,6 @@ class Users {
   async getAll(){
     const users = await this.pg.many('SELECT * FROM users')
     await this._loadHyperlinkProfiles(users)
-    console.log('users!!', users)
     return users
   }
 
@@ -63,9 +62,27 @@ class Users {
       [hlIdentity.id, hlIdentity.secretKey]
     )
 
-
-
     return await this.get(username)
+  }
+
+  async updateProfile(username, { realname }){
+    const {
+      hyperlink_id: id,
+      hyperlink_secret_key: secretKey,
+    } = await this.pg.one(
+      `
+        SELECT
+          hyperlinc_secret_keys.hyperlink_id,
+          hyperlinc_secret_keys.hyperlink_secret_key
+        FROM users
+        LEFT JOIN hyperlinc_secret_keys
+        ON hyperlinc_secret_keys.hyperlink_id = users.hyperlink_id
+        WHERE username=$1
+      `,
+      [username]
+    )
+    const hlIdentity = await this.hl.getIdentity(id, secretKey)
+    await hlIdentity.patchProfile({ realname })
   }
 
 }

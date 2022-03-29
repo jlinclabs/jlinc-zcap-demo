@@ -122,6 +122,14 @@ function createApp(options){
     createSessionCookie(res, user.username)
   })
 
+  router.post('/profile', async (req, res) => {
+    const { currentUser } = res.locals
+    const { realname } = req.body
+    await app.users.updateProfile(currentUser.username, { realname })
+    res.redirect('/')
+  })
+
+
   router.get('/send-me-to', (req, res) => {
     const { email } = res.locals.session
     const appUrl = req.query.app

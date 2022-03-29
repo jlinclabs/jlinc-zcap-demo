@@ -5,25 +5,16 @@
 
 {{#if currentUser}}
   <h2>Welcome back @{{currentUser.username}}</h2>
-  {{!-- <h5>Logged in as: {{session.username}}</h5> --}}
-  <form method="post" action="/logout">
-    <a href="/logout" onclick="this.parentElement.submit(); return false">logout</a>
-  </form>
-
-
-  <h5>Update profile</h5>
-  <form method="post" action="/profile">
-    <p>
-      <label for="realname-input">Real Name</label><br/>
-      <input required id="realname-input"
-        type="text"
-        name="realname"
-        value="{{currentUser.realname}}"
-        placeholder="Beth Smith"
-      />
-      <button type="submit" class="btn btn-primary">UPDATE</button>
-    </p>
-  </form>
+  <ul>
+    <li>
+      <form method="post" action="/logout">
+        <a href="/logout" onclick="this.parentElement.submit(); return false">logout</a>
+      </form>
+    </li>
+    <li>
+      <a href="/@{{currentUser.username}}">profile</a>
+    </li>
+  </ul>
 
 {{else}}
   <h5>Welcome New User</h5>

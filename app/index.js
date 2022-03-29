@@ -127,18 +127,17 @@ function createApp(options){
     const { username } = req.params
     const itsUs = currentUser && currentUser.username === username
     const user = itsUs ? currentUser : (await app.users.get(username))
-    const profileEvents = user && await app.users.getProfileEvents(username)
-    console.log({ profileEvents })
+    const hyperlincEvents = user && await app.users._getAllHyperlincEvents(username)
     res.render('profile', {
-      username, itsUs, user, profileEvents
+      username, itsUs, user, hyperlincEvents
     })
   })
 
   router.post('/profile', async (req, res) => {
-    const { currentUser } = res.locals
+    const { username } = res.locals.currentUser
     const changes = req.body
-    await app.users.updateProfile(currentUser.username, changes)
-    res.redirect('/')
+    await app.users.updateProfile(username, changes)
+    res.redirect(`/@${username}`)
   })
 
   router.get('/send-me-to', (req, res) => {

@@ -1,7 +1,5 @@
 <h1>@{{username}}</h1>
 
-<pre><code>{{toJSON user}}</code></pre>
-
 {{#if user}}
   {{#if itsUs}}
     <form method="post" action="/profile">
@@ -41,9 +39,14 @@
     </dl>
   {{/if}}
 
-  <h4>Profile Events</h4>
-  {{#each profileEvents}}
-    {{toJSON this}}
+  <h4>Hyperlinc Events</h4>
+  {{#each hyperlincEvents}}
+    <fieldset>
+      <legend>{{eventType}}</legend>
+      {{at}}
+      <code>{{toJSON this}}</code>
+    </fieldset>
+
   {{/each}}
 
 {{else}}

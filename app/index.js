@@ -49,23 +49,39 @@ function createApp(options){
   // ROUTES
   const router = Router()
   app.use(router)
-  router.use('*', async (req, res, next) => {
-    // pg.connect((error, client, done)
-    // await pg.connect()
 
-    const sessionJwt = req.cookies[COOKIE_NAME]
-    if (sessionJwt) {
-      await new Promise((resolve, reject) => {
-        jwt.verify(sessionJwt, SESSION_SECRET, (error, session) => {
-          if (error){
-            if (error) res.cookie('session', null)
-          }else{
-            res.locals.session = session
-          }
-          resolve()
-        })
+  async function verifySession(sessionJwt){
+    const session = await new Promise((resolve, reject) => {
+      jwt.verify(sessionJwt, SESSION_SECRET, (error, session) => {
+        if (error) reject(error)
+        else resolve(session)
       })
+    })
+
+    return session
+  }
+
+  router.use('*', async (req, res, next) => {
+    const sessionJwt = req.cookies[COOKIE_NAME]
+    let session
+    if (sessionJwt){
+      try{
+        session = await verifySession(sessionJwt)
+      }catch(error){
+        res.cookie('session', null)
+      }
     }
+
+    let currentUser
+    if (session) {
+      currentUser = await app.db.getUser(session.username)
+      if (!currentUser){
+        res.status(401).clearCookie(COOKIE_NAME).redirect('/')
+        return
+      }
+    }
+
+    Object.assign(res.locals, { session, currentUser })
 
     next()
   })

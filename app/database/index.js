@@ -29,9 +29,12 @@ module.exports = class Database {
 
   async createUser({ username, realname }){
     const { rows: [ user ] } = await this.pg.query(
-      `INSERT INTO users(username, realname) VALUES($1, $2) RETURNING *`,
-      [username, realname]
+      `INSERT INTO users(username) VALUES($1) RETURNING *`,
+      [username]
     )
+    // create hypercores
+    // append inital message
+    // append profile update declairing realname
     return user
   }
 

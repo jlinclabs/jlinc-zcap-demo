@@ -1,0 +1,7 @@
+#!/usr/bin/env bash
+
+concurrently \
+  --names "cat-walkers,bad-birders,dope-dogs" \
+  "./scripts/pg-prepare ./dev/apps/cat-walkers" \
+  "./scripts/pg-prepare ./dev/apps/bad-birders" \
+  "./scripts/pg-prepare ./dev/apps/dope-dogs"

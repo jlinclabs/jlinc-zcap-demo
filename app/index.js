@@ -138,8 +138,19 @@ function createApp(options){
     const identity = await app.hl.getIdentity(id)
     await identity.update()
     const hyperlincEvents = await identity.getAllEvents()
+    const writable = (
+      await app.pg.query(
+        `
+        SELECT 1
+        FROM hyperlinc_secret_keys
+        WHERE hyperlinc_id = $1
+        `,
+        [id]
+      )
+    ).rowCount > 0
     res.render('hyperlinc_events', {
-      hyperlincEvents
+      writable,
+      hyperlincEvents,
     })
   })
 

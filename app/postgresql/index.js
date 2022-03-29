@@ -4,7 +4,20 @@ const Path = require('path')
 
 const SCHEMA_PATH = Path.resolve(__dirname, './schema.sql')
 
-module.exports = class Postgresql {
+module.exports = function(options){
+  const pg = new PGPool({
+    connectionString: options.postgresDatabaseUrl,
+  })
+  return pg
+}
+
+module.exports.resetSchema = async function(){
+  const pg = this()
+  const schema = await readFile(SCHEMA_PATH)
+  await pg.query(`${schema}`)
+}
+
+class Postgresql {
   constructor(connectionString){
     this.pg = new PGPool({ connectionString })
   }

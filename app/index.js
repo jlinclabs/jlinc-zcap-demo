@@ -6,9 +6,10 @@ const hbs = require('express-hbs')
 const jwt = require('jsonwebtoken')
 const zcap = require('@jlinc/zcap')
 const parseUrl = require('url').parse
-// const { HypercoreLog } = require('./hypercore')
 
-const Database = require('./database')
+const Postgresql = require('./postgresql')
+const Hyperlinc = require('./hyperlinc')
+const Users = require('./models/users')
 
 hbs.handlebars.registerHelper('toJSON', object =>
   new hbs.handlebars.SafeString(JSON.stringify(object), null, 2)
@@ -18,10 +19,11 @@ function createApp(options){
   const appName = options.name
 
   const app = express()
-  // Object.assign(app, options)
   app.port = options.port
   app.url = options.url
-  app.db = new Database(options.postgresDatabaseUrl)
+  app.pg = new Postgresql(options.postgresDatabaseUrl)
+  app.hl = new Hyperlinc()
+  app.users = new Users({ pg: app.pg, hl: app.hl })
 
   app.use(express.static(__dirname + '/public'));
   app.use(bodyParser.urlencoded({ extended: false }))
@@ -74,7 +76,7 @@ function createApp(options){
 
     let currentUser
     if (session) {
-      currentUser = await app.db.getUser(session.username)
+      currentUser = await app.users.get(session.username)
       if (!currentUser){
         res.status(401).clearCookie(COOKIE_NAME).redirect('/')
         return
@@ -88,7 +90,7 @@ function createApp(options){
 
   router.get('/', async (req, res) => {
     res.render('index', {
-      users: await app.db.getAllUsers(),
+      users: await app.users.getAll(),
     })
   })
 
@@ -107,7 +109,7 @@ function createApp(options){
 
   router.post('/login', async (req, res) => {
     const { username } = req.body
-    const user = await app.db.getUser(username)
+    const user = await app.users.get(username)
     if (user) {
       createSessionCookie(res, user.username)
     }else{
@@ -125,7 +127,7 @@ function createApp(options){
 
   router.post('/signup', async (req, res) => {
     const { username, realname } = req.body
-    const user = await app.db.createUser({ username, realname })
+    const user = await app.users.create({ username, realname })
     createSessionCookie(res, user.username)
   })
 

@@ -26,6 +26,7 @@
     "express": "^4.17.3",
     "express-hbs": "^2.4.0",
     "express-promise-router": "^4.1.1",
+    "hypercore": "10.0.0-alpha.31",
     "hyperswarm": "git+https://github.com/hyperswarm/hyperswarm#v3.0.2",
     "jsonwebtoken": "^8.5.1",
     "pg": "^8.7.3"

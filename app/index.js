@@ -38,7 +38,8 @@ function createApp(options){
   app.set('view engine', 'hbs')
   app.set('views', __dirname + '/views')
   Object.assign(app.locals, {
-    appName
+    appName,
+    appColor: options.color,
     // app: options,
     // partnerApps: options.zcapCapabilities.map(zc => {
     //   let url = parseUrl(zc.targetUri)

@@ -8,14 +8,25 @@ module.exports = function(options){
   const pg = new PGPool({
     connectionString: options.postgresDatabaseUrl,
   })
-  pg.resetSchema = resetSchema;
+  Object.assign(pg, {
+    async resetSchema(){
+      const schema = await readFile(SCHEMA_PATH)
+      await this.query(`${schema}`)
+    },
+
+    async many(...args){
+      const results = await this.query(...args)
+      return results.rows
+    },
+
+    async one(...args){
+      const [ row ] = await this.many(...args)
+      return row
+    }
+  })
   return pg
 }
 
-async function resetSchema(){
-  const schema = await readFile(SCHEMA_PATH)
-  await this.query(`${schema}`)
-}
 
 // class Postgresql {
 //   constructor(connectionString){

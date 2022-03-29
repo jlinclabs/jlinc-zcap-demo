@@ -6,14 +6,14 @@ module.exports = class Users {
   }
 
   async getAll(){
-    const users = await this.pg.query('SELECT * FROM users')
+    const users = await this.pg.many('SELECT * FROM users')
     await this._loadHyperlinkProfiles(users)
     console.log('users!!', users)
     return users
   }
 
   async get(username){
-    const [ user ] = await this.pg.query(
+    const [ user ] = await this.pg.many(
       `SELECT * FROM users WHERE username = $1`,
       [username],
     )

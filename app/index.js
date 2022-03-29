@@ -4,7 +4,7 @@ const bodyParser = require('body-parser')
 const cookieParser = require('cookie-parser')
 const hbs = require('express-hbs')
 const jwt = require('jsonwebtoken')
-const pg = require('pg')
+const { Pool: PGPool } = require('pg')
 
 
 const zcap = require('@jlinc/zcap')
@@ -17,7 +17,7 @@ hbs.handlebars.registerHelper('toJSON', object =>
 
 function createApp(options){
   const appName = options.name
-  const pgClient = new pg.Client({
+  const pg = new PGPool({
     connectionString: options.postgresDatabaseUrl,
   })
 
@@ -52,7 +52,7 @@ function createApp(options){
   const router = Router()
   app.use(router)
   router.use('*', (req, res, next) => {
-    // pgClient.connect() wrap in tx?
+    // pg.connect((error, client, done)
 
 
     const sessionJwt = req.cookies[COOKIE_NAME]

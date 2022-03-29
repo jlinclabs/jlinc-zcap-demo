@@ -10,7 +10,7 @@ class Users {
 
   async getAll(){
     const users = await this.pg.many('SELECT * FROM users')
-    await this._loadHyperlinkProfiles(users)
+    await this._loadHyperlincProfiles(users)
     return users
   }
 
@@ -19,13 +19,13 @@ class Users {
       `SELECT * FROM users WHERE username = $1`,
       [username],
     )
-    if (user) await this._loadHyperlinkProfiles([user])
+    if (user) await this._loadHyperlincProfiles([user])
     return user
   }
 
-  async _loadHyperlinkProfiles(users){
+  async _loadHyperlincProfiles(users){
     const profiles = await this.hl.getProfiles(
-      users.map(u => u.hyperlink_id)
+      users.map(u => u.hyperlinc_id)
     )
     users.forEach((user, index) => {
       const profile = profiles[index]
@@ -46,7 +46,7 @@ class Users {
 
     const user = await this.pg.one(
       `
-      INSERT INTO users(username, hyperlink_id)
+      INSERT INTO users(username, hyperlinc_id)
       VALUES($1, $2)
       RETURNING *
       `,
@@ -65,18 +65,18 @@ class Users {
     return await this.get(username)
   }
 
-  async _getHyperlinkIdentity(username){
+  async _getHyperlincIdentity(username){
     const {
-      hyperlink_id: id,
-      hyperlink_secret_key: secretKey,
+      hyperlinc_id: id,
+      hyperlinc_secret_key: secretKey,
     } = await this.pg.one(
       `
         SELECT
-          hyperlinc_secret_keys.hyperlink_id,
-          hyperlinc_secret_keys.hyperlink_secret_key
+          hyperlinc_secret_keys.hyperlinc_id,
+          hyperlinc_secret_keys.hyperlinc_secret_key
         FROM users
         LEFT JOIN hyperlinc_secret_keys
-        ON hyperlinc_secret_keys.hyperlink_id = users.hyperlink_id
+        ON hyperlinc_secret_keys.hyperlinc_id = users.hyperlinc_id
         WHERE username=$1
       `,
       [username]
@@ -85,14 +85,14 @@ class Users {
   }
 
   async updateProfile(username, changes){
-    const hlIdentity = await this._getHyperlinkIdentity(username)
+    const hlIdentity = await this._getHyperlincIdentity(username)
     await hlIdentity.patchProfile(changes)
   }
 
   async _getAllHyperlincEvents(username){
-    const hlIdentity = await this._getHyperlinkIdentity(username)
+    const hlIdentity = await this._getHyperlincIdentity(username)
     await hlIdentity.update()
-    return await hlIdentity.getEventsForType('patchProfile')
+    return await hlIdentity.getAllEvents()
   }
 
 }

@@ -1,0 +1,16 @@
+<h1>@{{username}}</h1>
+
+<pre><code>{{toJSON user}}</code></pre>
+
+{{#if user}}
+  <dl>
+    <dt>Real Name:</dt>
+    <dd>{{user.realname}}</dd>
+    <dt>Email:</dt>
+    <dd>{{user.email}}</dd>
+    <dt>Created:</dt>
+    <dd>{{user.created_at}}</dd>
+  </dl>
+{{else}}
+  <i>user not found</i>
+{{/if}}

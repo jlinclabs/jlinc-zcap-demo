@@ -71,8 +71,10 @@
 <ul>
   {{#each users}}
     <li>
-      @{{username}} -
-      {{realname}} -
+      <a href="/@{{username}}">
+        @{{username}} - {{realname}}
+      </a>
+      <span> - </span>
       <form method="post" action="/login" style="display: inline">
         <input type="hidden" name="username" value="{{username}}"/>
         <a href="/login" onclick="this.parentElement.submit(); return false">login-as</a>

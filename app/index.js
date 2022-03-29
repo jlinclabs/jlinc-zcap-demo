@@ -129,6 +129,14 @@ function createApp(options){
     res.redirect('/')
   })
 
+  router.get('/@:username', async (req, res) => {
+    const { username } = req.params
+    res.render('profile', {
+      username,
+      user: await app.users.get(username),
+    })
+  })
+
 
   router.get('/send-me-to', (req, res) => {
     const { email } = res.locals.session

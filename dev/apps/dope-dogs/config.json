@@ -3,7 +3,7 @@
   "color": "khaki",
   "port": 4002,
   "url": "https://dope-dogs.zcap.test",
-  "databaseUrl": "postgresql://localhost/zcap-demo-drope-dogs",
+  "postgresDatabaseUrl": "postgresql://localhost/zcap-demo-dope-dogs",
   "hypercoreKeys": {
     "publicKey": "67dd51a8828e08dc621360a085ba74966c7b2adb178ae610c3f904706f827364",
     "secretKey": "f25d65fe26664a095ffd99b1000d9933f90bd557d7092b1ab84623701fc8312667dd51a8828e08dc621360a085ba74966c7b2adb178ae610c3f904706f827364"

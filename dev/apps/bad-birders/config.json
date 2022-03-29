@@ -3,7 +3,7 @@
   "color": "aqua",
   "port": 4001,
   "url": "https://bad-birders.zcap.test",
-  "databaseUrl": "postgresql://localhost/zcap-demo-bad-birders",
+  "postgresDatabaseUrl": "postgresql://localhost/zcap-demo-bad-birders",
   "hypercoreKeys": {
     "publicKey": "01a8cd697302f406cb77f9276c270b27dd6c7d4717c68872ea219f9fe4d690d6",
     "secretKey": "f8b3f4de8c273fff1eaa2508cf55f270fb5538a9a213f8dedc894719f986c0ac01a8cd697302f406cb77f9276c270b27dd6c7d4717c68872ea219f9fe4d690d6"

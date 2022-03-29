@@ -4,9 +4,12 @@ const bodyParser = require('body-parser')
 const cookieParser = require('cookie-parser')
 const hbs = require('express-hbs')
 const jwt = require('jsonwebtoken')
+const pg = require('pg')
+
+
 const zcap = require('@jlinc/zcap')
 const parseUrl = require('url').parse
-const { HypercoreLog } = require('./hypercore')
+// const { HypercoreLog } = require('./hypercore')
 
 hbs.handlebars.registerHelper('toJSON', object =>
   new hbs.handlebars.SafeString(JSON.stringify(object), null, 2)
@@ -14,6 +17,10 @@ hbs.handlebars.registerHelper('toJSON', object =>
 
 function createApp(options){
   const appName = options.name
+  const pgClient = new pg.Client({
+    connectionString: options.postgresDatabaseUrl,
+  })
+
   const app = express()
   // Object.assign(app, options)
   app.port = options.port
@@ -41,25 +48,13 @@ function createApp(options){
   const SESSION_SECRET = `dont tell anyone this is ${appName}`
   const COOKIE_NAME = `session`
 
-  const ourHypercoreLog = new HypercoreLog(options.hypercoreKeys.publicKey, {
-    writable: true,
-    secretKey: options.hypercoreKeys.secretKey,
-  })
-  ourHypercoreLog.append({ appName, appStart: Date.now() })
-
-  const hypercorePartners = options.hypercorePartners.map(partner => {
-    const hypercore = new HypercoreLog(partner.publicKey, {
-      sparse: true,
-      writable: false,
-    })
-    hypercore.core.replicate(false)
-    return { ...partner, hypercore }
-  })
-
   // ROUTES
   const router = Router()
   app.use(router)
   router.use('*', (req, res, next) => {
+    // pgClient.connect() wrap in tx?
+
+
     const sessionJwt = req.cookies[COOKIE_NAME]
     const setSession = (error, session) => {
       if (error) res.cookie('session', null)
@@ -71,23 +66,23 @@ function createApp(options){
   })
 
   router.get('/', async (req, res) => {
-    const partners = await Promise.all(
-      hypercorePartners.map(async partner => {
-        return {
-          name: partner.name,
-          coreLength: partner.hypercore.core.length,
-          beeLength: partner.hypercore.bee.length,
-          entires: await partner.hypercore.all(),
-        }
-      })
-    )
+    // const partners = await Promise.all(
+    //   hypercorePartners.map(async partner => {
+    //     return {
+    //       name: partner.name,
+    //       coreLength: partner.hypercore.core.length,
+    //       beeLength: partner.hypercore.bee.length,
+    //       entires: await partner.hypercore.all(),
+    //     }
+    //   })
+    // )
     res.render('index', {
       hypercoreInfo: JSON.stringify({
-        ourLog: {
-          length: ourHypercoreLog.length,
-          // entries: await ourHypercoreLog.all(),
-        },
-        partners,
+        // ourLog: {
+        //   // length: ourHypercoreLog.length,
+        //   // entries: await ourHypercoreLog.all(),
+        // },
+        // partners,
       }, null, 2),
     })
   })

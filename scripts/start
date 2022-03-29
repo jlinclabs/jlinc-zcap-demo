@@ -1,26 +1,30 @@
 #!/usr/bin/env node
 
 const Path = require('path')
-const http = require('http')
+const getApp = require('../lib/getApp')
 
-const appDirectory = Path.resolve(process.argv[2])
-if (!appDirectory){
-  console.error(`app directory required`)
+// const appDirectory = Path.resolve(process.argv[2])
+// if (!appDirectory){
+//   console.error(`app directory required`)
+//   process.exit(1)
+// }
+// console.log(`appDirectory=${appDirectory}`)
+// process.chdir(appDirectory)
+// console.log(`cwd=${process.cwd()}`)
+
+// // fs.existsSync(appDirectory)
+
+// const configPath = Path.resolve(appDirectory + '/config.json')
+// console.log(`configPath=${configPath}`)
+
+// const config = require(configPath)
+
+const app = getApp(process.argv[2] || '.')
+if (!app){
+  console.error(`app not found`)
   process.exit(1)
 }
-console.log(`appDirectory=${appDirectory}`)
-process.chdir(appDirectory)
-console.log(`cwd=${process.cwd()}`)
 
-// fs.existsSync(appDirectory)
-
-const configPath = Path.resolve(appDirectory + '/config.json')
-console.log(`configPath=${configPath}`)
-
-const config = require(configPath)
-const { createApp } = require('../app')
-if (process.env.PORT) config.port = process.env.PORT
-const app = createApp(config)
 app.start(error => {
   if (error) console.error(error)
   else console.log(`${app.name} PORT=${app.port} ${app.url}`)

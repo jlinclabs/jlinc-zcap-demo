@@ -1,10 +1,6 @@
 #!/usr/bin/env bash
 
-concurrently \
-  --names "cat-walkers,bad-birders,dope-dogs" \
-  "rm -rf ./dev/apps/cat-walkers/hyperlinc" \
-  "rm -rf ./dev/apps/bad-birders/hyperlinc" \
-  "rm -rf ./dev/apps/dope-dogs/hyperlinc"
+git clean -Xf ./dev
 
 concurrently \
   --names "cat-walkers,bad-birders,dope-dogs" \

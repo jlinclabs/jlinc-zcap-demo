@@ -1,0 +1,13 @@
+#!/usr/bin/env node
+
+const sodium = require('sodium-universal')
+const b4a = require('b4a')
+const dht = require('@hyperswarm/dht')
+
+const seed = b4a.alloc(sodium.crypto_sign_SEEDBYTES)
+sodium.randombytes_buf(seed)
+console.log(`${seed.toString('hex')}`)
+
+console.log(
+  dht.keyPair(seed)
+)

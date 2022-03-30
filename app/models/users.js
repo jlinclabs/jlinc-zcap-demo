@@ -35,6 +35,7 @@ class Users {
   }
 
   async create({ username, hyperlincId }){
+    console.log('CREATE USER', { username, hyperlincId })
     if (await this.get(username))
       throw new Error(`"${username}" is taken`)
 

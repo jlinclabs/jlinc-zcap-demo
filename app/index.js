@@ -97,14 +97,16 @@ function createApp(options){
     res.render('login')
   })
 
-  const createSessionCookie = (res, username) =>
+  function createSessionCookie(res, username, destination = '/'){
+    if (!username) throw new Error('no username!')
     res
       .cookie(COOKIE_NAME, jwt.sign(
         { username },
         SESSION_SECRET,
         { expiresIn: 86400 }
       ))
-      .redirect('/')
+      .redirect(destination)
+  }
 
   router.post('/login', async (req, res) => {
     const { username } = req.body
@@ -124,10 +126,14 @@ function createApp(options){
     res.status(200).clearCookie(COOKIE_NAME).redirect('/')
   })
 
+  router.get('/signup', (req, res) => {
+    res.render('signup')
+  })
+
   router.post('/signup', async (req, res) => {
     const { username, realname } = req.body
     const user = await app.users.create({ username, realname })
-    createSessionCookie(res, user.username)
+    createSessionCookie(res, user.username, `/@${user.username}`)
   })
 
   router.get('/@:username', async (req, res) => {
@@ -167,15 +173,18 @@ function createApp(options){
           username: hlProfile.preferredUsername,
           hyperlincId,
         })
-        if (user) return createSessionCookie(res, user.username)
+        return createSessionCookie(res, user.username)
       }
-      return res.render('hypersignup', {
-        hlProfile,
-      })
+      return res.render('hypersignup', { hyperlincId, hlProfile })
     }
     res.render('error', { error: { message: 'didnt work :(' }})
   })
 
+  router.post('/hyper-signup', async (req, res) => {
+    const { hlid: hyperlincId, username } = req.body
+    const user = await app.users.create({ username, hyperlincId })
+    return createSessionCookie(res, user.username)
+  })
 
   router.get('/__hyperlinc/:id', async (req, res) => {
     const { id } = req.params

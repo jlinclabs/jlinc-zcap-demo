@@ -1,10 +1,12 @@
-
-{{!-- <textarea style="width: 100vw; height: 100vh;">{{debug}}</textarea> --}}
-
-
-
 {{#if currentUser}}
-  <h2>Welcome back @{{currentUser.username}}</h2>
+  <h2>
+    Welcome back
+    {{#if currentUser.realname}}
+      {{currentUser.realname}}
+    {{else}}
+      @{{currentUser.username}}
+    {{/if}}
+  </h2>
   <ul>
     <li>
       <form method="post" action="/logout">

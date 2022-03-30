@@ -155,16 +155,17 @@ function createApp(options){
   })
 
   router.get('/hyper-login', async (req, res) => {
-    const { hlid } = req.query
-    const user = await app.users.findByHyperlincId(hlid)
+    const hyperlincId = req.query.hlid
+    const user = await app.users.findByHyperlincId(hyperlincId)
     if (user) return createSessionCookie(res, user.username)
 
-    const [hlProfile] = await app.hl.getProfiles([hlid])
+    const [hlProfile] = await app.hl.getProfiles([hyperlincId])
     console.log({ hlProfile })
     if (hlProfile){
       if (hlProfile.preferredUsername){
         const user = await app.users.create({
           username: hlProfile.preferredUsername,
+          hyperlincId,
         })
         if (user) return createSessionCookie(res, user.username)
       }

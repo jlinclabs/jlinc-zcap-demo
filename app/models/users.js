@@ -34,7 +34,7 @@ class Users {
     })
   }
 
-  async create({ username, realname, hyperlincId }){
+  async create({ username, hyperlincId }){
     if (await this.get(username))
       throw new Error(`"${username}" is taken`)
 
@@ -42,10 +42,10 @@ class Users {
       ? await this.hl.getIdentity(hyperlincId)
       : await this.hl.createIdentity({ appUrl: this.appUrl })
 
-    await hlIdentity.patchProfile({
-      realname,
-      preferredUsername: username,
-    })
+    // await hlIdentity.patchProfile({
+    //   realname,
+    //   preferredUsername: username,
+    // })
 
     const user = await this.pg.one(
       `

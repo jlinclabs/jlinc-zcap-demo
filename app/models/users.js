@@ -84,8 +84,7 @@ class Users {
       `,
       [username]
     )
-    console.log({ record })
-    if (!record || record.username !== username || !record.hyperlinc_id){
+    if (!record){
       console.error(`bad username? "${username}"`)
       return
     }

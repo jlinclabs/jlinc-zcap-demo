@@ -8,6 +8,10 @@ module.exports = function(options){
   const pg = new PGPool({
     connectionString: options.postgresDatabaseUrl,
   })
+  process.on('SIGTERM', () => {
+    console.log('CLOSING CONN TO POSTGRESQL')
+    pg.destroy()
+  })
   Object.assign(pg, {
     async resetSchema(){
       const schema = await readFile(SCHEMA_PATH)

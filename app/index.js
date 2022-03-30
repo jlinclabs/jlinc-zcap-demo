@@ -141,6 +141,7 @@ function createApp(options){
     const { username } = req.params
     const itsUs = currentUser && currentUser.username === username
     const user = itsUs ? currentUser : (await app.users.get(username))
+    console.log({ username, user })
     const hyperlincEvents = user && await app.users._getAllHyperlincEvents(username)
     res.render('profile', {
       username, itsUs, user, hyperlincEvents

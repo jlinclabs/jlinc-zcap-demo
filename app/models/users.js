@@ -71,13 +71,11 @@ class Users {
   }
 
   async _getHyperlincIdentity(username){
-    const {
-      hyperlinc_id: id,
-      hyperlinc_secret_key: secretKey,
-    } = await this.pg.one(
+    const record = await this.pg.one(
       `
         SELECT
-          hyperlinc_secret_keys.hyperlinc_id,
+          users.username,
+          users.hyperlinc_id,
           hyperlinc_secret_keys.hyperlinc_secret_key
         FROM users
         LEFT JOIN hyperlinc_secret_keys
@@ -86,7 +84,14 @@ class Users {
       `,
       [username]
     )
-    return await this.hl.getIdentity(id, secretKey)
+    console.log({ record })
+    if (!record || record.username !== username || !record.hyperlinc_id){
+      console.error(`bad username? "${username}"`)
+      return
+    }
+
+    return await this.hl
+      .getIdentity(record.hyperlinc_id, record.hyperlinc_secret_key)
   }
 
   async findByHyperlincId(hyperlincId){

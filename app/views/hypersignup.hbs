@@ -1,0 +1,21 @@
+<h3>Hyper Signup</h3>
+
+<form method="post" action="/login">
+  <dl>
+    <dt>Real Name:</dt>
+    <dd>{{hlProfile.realname}}</dd>
+    <dt>Email:</dt>
+    <dd>{{hlProfile.email}}</dd>
+  </dl>
+  <p>
+    <label for="login-input-username">Username</label><br/>
+    <input id="login-input-username" type="text" name="username"/>
+  </p>
+  {{!-- <p>
+    <label for="login-input-password">Password: </label><br/>
+    <input id="login-input-password" type="password" name="password"/>
+  </p> --}}
+  <button type="submit" class="btn btn-primary">SIGNUP</button>
+</form>
+
+<pre>{{toJSON hlProfile}}</pre>

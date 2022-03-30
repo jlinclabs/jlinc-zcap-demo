@@ -4,8 +4,6 @@ const bodyParser = require('body-parser')
 const cookieParser = require('cookie-parser')
 const hbs = require('express-hbs')
 const jwt = require('jsonwebtoken')
-const zcap = require('@jlinc/zcap')
-const parseUrl = require('url').parse
 
 hbs.handlebars.registerHelper('toJSON', object =>
   new hbs.handlebars.SafeString(JSON.stringify(object), null, 2)
@@ -34,10 +32,20 @@ function createApp(options){
   Object.assign(app.locals, {
     appName,
     appColor: options.color,
+    // TODO move this static lists
+    partnerApps: [
+      {name: 'cat-walkers', url: 'https://cat-walkers.zcap.test'},
+      {name: 'dope-dogs', url: 'https://dope-dogs.zcap.test'},
+      {name: 'bad-birders', url: 'https://bad-birders.zcap.test'},
+    ].filter(pa => pa.url !== app.url)
   })
 
   const SESSION_SECRET = `dont tell anyone this is ${appName}`
   const COOKIE_NAME = `session`
+
+  app.start = function start(callback){
+    app.server = app.listen(app.port, callback)
+  }
 
   // ROUTES
   const router = Router()
@@ -133,6 +141,41 @@ function createApp(options){
     })
   })
 
+  router.post('/profile', async (req, res) => {
+    const { username } = res.locals.currentUser
+    const changes = req.body
+    await app.users.updateProfile(username, changes)
+    res.redirect(`/@${username}`)
+  })
+
+  router.get('/send-me-to', (req, res) => {
+    const { currentUser } = res.locals
+    const appUrl = req.query.app
+    res.redirect(`${appUrl}/hyper-login?hlid=${currentUser.hyperlinc_id}`)
+  })
+
+  router.get('/hyper-login', async (req, res) => {
+    const { hlid } = req.query
+    const user = await app.users.findByHyperlincId(hlid)
+    if (user) return createSessionCookie(res, user.username)
+
+    const [hlProfile] = await app.hl.getProfiles([hlid])
+    console.log({ hlProfile })
+    if (hlProfile){
+      if (hlProfile.preferredUsername){
+        const user = await app.users.create({
+          username: hlProfile.preferredUsername,
+        })
+        if (user) return createSessionCookie(res, user.username)
+      }
+      return res.render('hypersignup', {
+        hlProfile,
+      })
+    }
+    res.render('error', { error: { message: 'didnt work :(' }})
+  })
+
+
   router.get('/__hyperlinc/:id', async (req, res) => {
     const { id } = req.params
     const identity = await app.hl.getIdentity(id)
@@ -153,75 +196,6 @@ function createApp(options){
       hyperlincEvents,
     })
   })
-
-  router.post('/profile', async (req, res) => {
-    const { username } = res.locals.currentUser
-    const changes = req.body
-    await app.users.updateProfile(username, changes)
-    res.redirect(`/@${username}`)
-  })
-
-  router.get('/send-me-to', (req, res) => {
-    const { email } = res.locals.session
-    const appUrl = req.query.app
-    const user = options.users.find(user => user.email === email)
-    if (!user) throw new Error(`cant find user email="${email}"`)
-
-    const capability = options.zcapCapabilities.find(capability =>
-      capability.targetUri.startsWith(appUrl)
-    )
-    if (!capability) throw new Error(`cant find capability`)
-
-    // signed by the user identity
-    const delegatedCapability = zcap.delegate(
-      user.zcapIdentity,
-      capability.id,
-      options.zcapIdentity,
-      ['authorization'],
-      { email },
-    );
-
-    // signed by the server identity
-    const jwt = zcap.invokeDelegable(
-      user.zcapIdentity,
-      delegatedCapability,
-    );
-
-    res.redirect(`${capability.targetUri}?zcap=${jwt}`)
-  })
-
-  router.get('/zcap-login', (req, res) => {
-    const delegatedCapability = zcap.verifyZcapInvocation(req.query.zcap);
-
-    const zauthCap = options.zcapAuthenticationCapabilities.find(zauthCap =>
-      zauthCap.id === delegatedCapability.parentCapabilityId
-    )
-    const { email } = delegatedCapability.zcap.pii
-    const did = delegatedCapability.invoker
-
-    // query for existing user for did
-    // if !exists
-    //    insert user record here
-    //        associated with did
-    //
-    // login as user
-
-    // res.json({ zauthCap, delegatedCapability })
-
-    const sessionJwt = jwt.sign({ email, did }, SESSION_SECRET, { expiresIn: 86400 });
-    res
-      .status(200)
-      .cookie(COOKIE_NAME, sessionJwt)
-      .redirect('/')
-
-
-    // TODO login magic
-    // res.redirect('/')
-  })
-
-  app.start = function start(callback){
-    app.server = app.listen(app.port, callback)
-  }
 
   return app
 }

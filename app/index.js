@@ -13,6 +13,7 @@ function createApp(options){
   const appName = options.name
 
   const app = express()
+  app.options = options
   app.port = options.port
   app.url = options.url
   app.pg = require('./postgresql')(options)
@@ -44,6 +45,8 @@ function createApp(options){
   const COOKIE_NAME = `session`
 
   app.start = function start(callback){
+    app.pg.connect()
+    app.hl.connect()
     app.server = app.listen(app.port, callback)
   }
 

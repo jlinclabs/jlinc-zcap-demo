@@ -34,11 +34,7 @@ function createApp(options){
     appName,
     appColor: options.color,
     // TODO move this static lists
-    partnerApps: [
-      {name: 'cat-walkers', url: 'https://cat-walkers.zcap.test'},
-      {name: 'dope-dogs', url: 'https://dope-dogs.zcap.test'},
-      {name: 'bad-birders', url: 'https://bad-birders.zcap.test'},
-    ].filter(pa => pa.url !== app.url)
+    partnerApps: options.partnerApps,
   })
 
   const SESSION_SECRET = `dont tell anyone this is ${appName}`

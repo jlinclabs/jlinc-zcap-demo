@@ -7,5 +7,15 @@
   "hypercoreKeys": {
     "publicKey": "e4c0d54d09b3f0842fa403b73d220b829bda989cb03efb37eedefb37d2cde5fe",
     "secretKey": "46e982fe19e056039c20db64af4e1ce29344aba2c41745d480c68c7f2c5b6660e4c0d54d09b3f0842fa403b73d220b829bda989cb03efb37eedefb37d2cde5fe"
-  }
+  },
+  "partnerApps": [
+    {
+      "name": "dope-dogs",
+      "url": "https://dope-dogs.zcap.test"
+    },
+    {
+      "name": "bad-birders",
+      "url": "https://bad-birders.zcap.test"
+    }
+  ]
 }

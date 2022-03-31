@@ -209,6 +209,10 @@ function createApp(options){
     })
   })
 
+  router.use((error, req, res) => {
+    res.render('error', { error })
+  })
+
   return app
 }
 

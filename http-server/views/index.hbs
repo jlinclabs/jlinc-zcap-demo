@@ -54,9 +54,9 @@
 <ul>
   {{#each users}}
     <li>
-      <a href="/@{{username}}">
-        @{{username}} - {{realname}}
-      </a>
+      <a href="/@{{username}}">@{{username}}</a>
+      <span> - </span>
+      <a href="/@{{username}}">{{realname}}</a>
       <span> - </span>
       <form method="post" action="/login" style="display: inline">
         <input type="hidden" name="username" value="{{username}}"/>

@@ -9,7 +9,7 @@ hbs.handlebars.registerHelper('toJSON', object =>
   new hbs.handlebars.SafeString(JSON.stringify(object), null, 2)
 )
 
-function createApp(options){
+function createHttpServer(options){
   const appName = options.name
 
   const app = express()
@@ -219,4 +219,4 @@ function createApp(options){
   return app
 }
 
-Object.assign(module.exports, { createApp })
+module.exports = createHttpServer

@@ -1,8 +1,8 @@
 #!/usr/bin/env node
 
-const getApp = require('../lib/getApp')
+const getHttpServer = require('../lib/getHttpServer')
 
-const app = getApp(process.argv[2] || '.')
+const app = getHttpServer(process.argv[2] || '.')
 if (!app){
   console.error(`app not found`)
   process.exit(1)

@@ -40,10 +40,14 @@ function createApp(options){
   const SESSION_SECRET = `dont tell anyone this is ${appName}`
   const COOKIE_NAME = `session`
 
-  app.start = function start(callback){
-    app.pg.connect()
-    app.hl.connect()
-    app.server = app.listen(app.port, callback)
+  app.start = async function start(){
+    await app.pg.connect()
+    await app.hl.connect()
+    await new Promise((resolve, reject) => {
+      app.server = app.listen(app.port, error => {
+        if (error) reject(error); else resolve();
+      })
+    })
   }
 
   // ROUTES
@@ -173,7 +177,10 @@ function createApp(options){
         })
         return createSessionCookie(res, user.username)
       }
-      return res.render('hypersignup', { hyperlincId, hlProfile })
+      const hyperlincStatus = await app.hl.status()
+      return res.render('hypersignup', {
+        hyperlincId, hlProfile, hyperlincStatus
+      })
     }
     res.render('error', { error: { message: 'didnt work :(' }})
   })

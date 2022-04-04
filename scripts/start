@@ -9,7 +9,11 @@ if (!app){
   process.exit(1)
 }
 
-app.start(error => {
-  if (error) console.error(error)
-  else console.log(`${app.name} PORT=${app.port} ${app.url}`)
+app.start().then(
+  () => {
+    console.log(`${app.name} PORT=${app.port} ${app.url}`)
+  },
+  error => {
+    console.error(error)
+  },
 })

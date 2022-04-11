@@ -1,7 +1,9 @@
 #!/usr/bin/env bash
 
-concurrently \
-  --names "cat-walkers,bad-birders,dope-dogs" \
+nodemon -w . --exec concurrently \
+  --kill-others \
+  --names "swarm-boot,cat-walkers,bad-birders,dope-dogs" \
+  "node ./bootstrapper.js" \
   "./scripts/start ./dev/apps/cat-walkers" \
   "./scripts/start ./dev/apps/bad-birders" \
   "./scripts/start ./dev/apps/dope-dogs"

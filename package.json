@@ -4,7 +4,7 @@
   "version": "1.0.0",
   "scripts": {
     "start": "./scripts/start",
-    "start:dev": "nodemon -w . --exec ./scripts/start-dev"
+    "start:dev": "nodemon -w . --exec ./scripts/dev-start"
   },
   "keywords": [],
   "repository": {

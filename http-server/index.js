@@ -4,6 +4,7 @@ const bodyParser = require('body-parser')
 const cookieParser = require('cookie-parser')
 const hbs = require('express-hbs')
 const jwt = require('jsonwebtoken')
+const zcap = require('@jlinc/zcap')
 
 hbs.handlebars.registerHelper('toJSON', object =>
   new hbs.handlebars.SafeString(JSON.stringify(object), null, 2)
@@ -96,8 +97,17 @@ function createHttpServer(options){
     })
   })
 
-  router.get('/login', (req, res) => {
-    res.render('login')
+  router.get('/login', async (req, res) => {
+    if (req.query.zcap){
+      const delegatedCapability = zcap.verifyZcapInvocation(req.query.zcap);
+      const jlincDid = delegatedCapability.zcap.invokerDid
+      const user = await app.users.findByJlincDid(jlincDid)
+      return user
+        ? createSessionCookie(res, user.username)
+        : res.render('zcapsignup', { jlincDid })
+    }else{
+      res.render('login')
+    }
   })
 
   function createSessionCookie(res, username, destination = '/'){
@@ -188,6 +198,12 @@ function createHttpServer(options){
   router.post('/hyper-signup', async (req, res) => {
     const { hlid: hyperlincId, username } = req.body
     const user = await app.users.create({ username, hyperlincId })
+    return createSessionCookie(res, user.username)
+  })
+
+  router.post('/zcap-signup', async (req, res) => {
+    const { jlincDid, username } = req.body
+    const user = await app.users.create({ username, jlincDid })
     return createSessionCookie(res, user.username)
   })
 

@@ -34,40 +34,44 @@ class Users {
     })
   }
 
-  async create({ username, hyperlincId }){
+  async create({ username, hyperlincId, jlincDid }){
     console.log('CREATE USER', { username, hyperlincId })
-    if (await this.get(username))
-      throw new Error(`"${username}" is taken`)
+    try{
+      if (await this.get(username))
+        throw new Error(`"${username}" is taken`)
 
-    const hlIdentity = hyperlincId
-      ? await this.hl.getIdentity(hyperlincId)
-      : await this.hl.createIdentity({ appUrl: this.appUrl })
+      console.log((hyperlincId ? `loading` : `creating`) + ` hyperlinc ID`)
+      const hlIdentity = hyperlincId
+        ? await this.hl.getIdentity(hyperlincId)
+        : await this.hl.createIdentity({ appUrl: this.appUrl })
 
-    // await hlIdentity.patchProfile({
-    //   realname,
-    //   preferredUsername: username,
-    // })
-
-    const user = await this.pg.one(
-      `
-      INSERT INTO users(username, hyperlinc_id)
-      VALUES($1, $2)
-      RETURNING *
-      `,
-      [username, hlIdentity.id]
-    )
-    if (!user) throw new Error(`failed to insert user`)
-
-    if (hlIdentity.secretKey)
-      await this.pg.one(
+      console.log('inserting user')
+      const user = await this.pg.one(
         `
-        INSERT INTO hyperlinc_secret_keys
-        VALUES($1, $2) RETURNING *
+        INSERT INTO users(username, hyperlinc_id, jlinc_did)
+        VALUES($1, $2, $3)
+        RETURNING *
         `,
-        [hlIdentity.id, hlIdentity.secretKey]
+        [username, hlIdentity.id, jlincDid]
       )
+      if (!user) throw new Error(`failed to insert user`)
 
-    return await this.get(username)
+      if (hlIdentity.secretKey){
+        console.log('inserting secret key')
+        await this.pg.one(
+          `
+          INSERT INTO hyperlinc_secret_keys
+          VALUES($1, $2) RETURNING *
+          `,
+          [hlIdentity.id, hlIdentity.secretKey]
+        )
+      }
+
+      return await this.get(username)
+    }catch(error){
+      console.error('users.create failed', error)
+      throw error
+    }
   }
 
   async _getHyperlincIdentity(username){
@@ -95,8 +99,16 @@ class Users {
 
   async findByHyperlincId(hyperlincId){
     const user = await this.pg.one(
-      `SELECT * FROM users WHERE hyperlinc_id=$1`,
+      `SELECT username FROM users WHERE hyperlinc_id=$1`,
       [hyperlincId]
+    )
+    if (user) return await this.get(user.username)
+  }
+
+  async findByJlincDid(jlincDid){
+    const user = await this.pg.one(
+      `SELECT username FROM users WHERE jlinc_did=$1`,
+      [jlincDid]
     )
     if (user) return await this.get(user.username)
   }

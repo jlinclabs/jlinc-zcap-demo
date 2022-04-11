@@ -62,8 +62,13 @@
         <input type="hidden" name="username" value="{{username}}"/>
         <a href="/login" onclick="this.parentElement.submit(); return false">login-as</a>
       </form>
+      <span> - </span>
+      <a href="/__hyperlinc/{{hyperlinc_id}}" class="truncate">{{hyperlinc_id}}</a>
     </li>
   {{else}}
     <i>no users :(</i>
   {{/each}}
 </ul>
+
+<h5>Hyperlinc Status</h5>
+<p>{{toJSON hyperlincStatus}}</p>

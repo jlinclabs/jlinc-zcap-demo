@@ -94,6 +94,7 @@ function createHttpServer(options){
   router.get('/', async (req, res) => {
     res.render('index', {
       users: await app.users.getAll(),
+      hyperlincStatus: await app.hl.status(),
     })
   })
 

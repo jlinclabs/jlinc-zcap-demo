@@ -1,15 +1,15 @@
 
-import { inspect } from 'util'
-import b4a from 'b4a'
-import sodium from 'sodium-universal'
-import Corestore from 'corestore'
-import Hyperswarm from 'hyperswarm'
-import crypto from 'hypercore-crypto'
-import dht from '@hyperswarm/dht'
+const { inspect }  = require('util')
+const b4a  = require('b4a')
+const sodium  = require('sodium-universal')
+const Corestore  = require('corestore')
+const Hyperswarm  = require('hyperswarm')
+const crypto  = require('hypercore-crypto')
+const dht  = require('@hyperswarm/dht')
 
 const TOPIC_KEY = fromHex('604d03ea2045c1adfcb6adad02d71667e03c27ec846fe4f5c4d912c10464aea0')
 
-export default class Hyperlinc {
+module.exports = class Hyperlinc {
   constructor(options = {}){
     const { storagePath } = options
     this.storagePath = storagePath

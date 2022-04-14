@@ -1,4 +1,7 @@
-const DHT = require('@hyperswarm/dht')
+#!/usr/bin/env node
+'use strict';
+
+import DHT from '@hyperswarm/dht'
 
 const bootstrapper = DHT.bootstrapper(49736, {
   ephemeral: true,

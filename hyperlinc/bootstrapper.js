@@ -3,7 +3,9 @@
 
 import DHT from '@hyperswarm/dht'
 
-const bootstrapper = DHT.bootstrapper(49736, {
+const PORT = process.env.PORT || 49736
+
+const bootstrapper = DHT.bootstrapper(PORT, {
   ephemeral: true,
   seed: DHT.hash(Buffer.from('jlinc-zcap-demo-dht-bootstrap')),
 })

@@ -3,7 +3,7 @@
 nodemon -w . --exec concurrently \
   --kill-others \
   --names "swarm-boot,cat-walkers,bad-birders,dope-dogs" \
-  "node ./bootstrapper.js" \
+  "node ./node_modules/hyperlinc/bootstrapper.js" \
   "./scripts/start ./dev/apps/cat-walkers" \
   "./scripts/start ./dev/apps/bad-birders" \
   "./scripts/start ./dev/apps/dope-dogs"

@@ -1,4 +1,4 @@
-const Hyperlinc = require('./hyperlinc')
+const Hyperlinc = require('hyperlinc')
 
 module.exports = function(options){
   const hl = new Hyperlinc({

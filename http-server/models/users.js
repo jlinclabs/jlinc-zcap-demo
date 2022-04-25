@@ -9,8 +9,10 @@ class Users {
   }
 
   async getAll(){
+    console.log('Users.getAll')
     const users = await this.pg.many('SELECT * FROM users')
     await this._loadHyperlincProfiles(users)
+    console.log('Users.getAll', users)
     return users
   }
 

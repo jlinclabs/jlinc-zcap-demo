@@ -7,13 +7,13 @@ const PORT = process.env.PORT || 49736
 
 const bootstrapper = DHT.bootstrapper(PORT, {
   ephemeral: true,
-  seed: DHT.hash(Buffer.from('jlinc-zcap-demo-dht-bootstrap')),
+  seed: DHT.hash(Buffer.from('hyperlinc')),
 })
 
 bootstrapper.ready().then(() => {
   console.log(
     'Hyperswarm bootstrapper running on port',
-    bootstrapper.address().port
+    bootstrapper.address(),
   )
 })
 
@@ -30,3 +30,4 @@ process.once('SIGINT', async function () {
   await bootstrapper.destroy()
   process.exit(0)
 })
+

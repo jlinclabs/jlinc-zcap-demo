@@ -71,4 +71,6 @@
 </ul>
 
 <h5>Hyperlinc Status</h5>
-<p>{{toJSON hyperlincStatus}}</p>
+<p>Connected: {{#if hyperlincStatus.connected}}yes{{else}}no{{/if}}</p>
+<p># of cores: {{hyperlincStatus.numberOfCores}}</p>
+<p>CORES:<br/>{{toJSON hyperlincStatus.cores}}</p>

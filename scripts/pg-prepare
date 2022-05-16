@@ -1,8 +1,9 @@
 #!/usr/bin/env node
 
-const getHttpServer = require('../lib/getHttpServer')
+if (process.argv[2]) process.chdir(process.argv[2])
+const app = require('../lib/getHttpServer')
 
-const app = getHttpServer(process.argv[2] || '.')
+const app = getHttpServer( || '.')
 if (!app){
   console.error(`app not found`)
   process.exit(1)

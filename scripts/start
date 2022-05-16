@@ -1,7 +1,6 @@
 #!/usr/bin/env node
 
-const Path = require('path')
-const getHttpServer = require('../lib/getHttpServer')
+const getHttpServer = require('../http-server')
 
 const app = getHttpServer(process.argv[2] || '.')
 if (!app){

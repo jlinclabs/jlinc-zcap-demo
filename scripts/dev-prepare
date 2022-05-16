@@ -4,6 +4,6 @@ git clean -Xf ./dev
 
 concurrently \
   --names "cat-walkers,bad-birders,dope-dogs" \
-  "./scripts/pg-prepare ./dev/apps/cat-walkers" \
-  "./scripts/pg-prepare ./dev/apps/bad-birders" \
-  "./scripts/pg-prepare ./dev/apps/dope-dogs"
+  "APP_DIR=./dev/apps/cat-walkers ./scripts/pg-prepare" \
+  "APP_DIR=./dev/apps/bad-birders ./scripts/pg-prepare" \
+  "APP_DIR=./dev/apps/dope-dogs ./scripts/pg-prepare"

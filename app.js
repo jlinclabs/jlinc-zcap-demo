@@ -12,7 +12,7 @@ const app = express()
 module.exports = app
 app.config = require('./appConfig')
 app.pg = require('./postgresql')
-// app.users = require('./models/users')
+app.users = require('./models/User')
 // app.hl = require('./hyperlinc')(config)
 
 const appName = app.config.name
@@ -62,7 +62,7 @@ app.start = async function start(){
     })
 
   await Promise.all([
-    app.sequelize.authenticate(),
+    // app.sequelize.authenticate(),
     startHttpServer()
   ])
 }
@@ -109,7 +109,7 @@ router.use('*', async (req, res, next) => {
 
 router.get('/', async (req, res) => {
   res.render('index', {
-    users: await app.users.findAll(),
+    users: await app.users.all(),
   })
 })
 

@@ -1,4 +1,6 @@
 const Path = require('path')
-const configPath = Path.join(process.cwd(), 'config.json')
+const APP_DIR = process.env.APP_DIR || process.cwd()
+const configPath = Path.resolve(__dirname, APP_DIR, 'config.json')
 console.log('CONFIG=', configPath)
-module.exports = configPath
+const config = require(configPath)
+module.exports = config

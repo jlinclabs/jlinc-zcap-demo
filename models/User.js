@@ -1,22 +1,15 @@
-const { DataTypes } = require('sequelize')
+const knex = require('../postgresql')
 
-module.exports = app =>
-  app.sequelize.define('user', {
-    id: {
-      type: DataTypes.INTEGER,
-      autoIncrement: true,
-      primaryKey: true
-    },
-    username: {
-      type: DataTypes.STRING,
-      allowNull: false
-    },
-    jlinx_account_id: {
-      type: DataTypes.STRING,
-      allowNull: true,
-      unique: true,
-    },
-  })
+class User {
+
+  static async all(){
+    const records = await knex('users').select('*')
+    return records.map(record => new User(record))
+  }
+
+}
+
+module.exports = User
 
 //   constructor({ url, pg, hl }){
 //     this.pg = pg

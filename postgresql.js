@@ -1,3 +1,21 @@
+const Path = require('path')
+const { readFile } = require('fs').promises
+
+
+const appConfig = require('./appConfig')
+const knex = require('knex')({
+  client: 'pg',
+  connection: appConfig.postgresDatabaseUrl,
+  debug: true,
+})
+module.exports = knex
+
+console.log(knex.context.client)
+knex.resetSchema = async function(){
+  const path = Path.resolve(__dirname, './schema.sql')
+  const schema = await readFile(path)
+  await this.query(`${schema}`)
+}
 // const { Pool: PGPool } = require('pg')
 // const { readFile } = require('fs').promises
 // const Path = require('path')

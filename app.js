@@ -8,30 +8,26 @@ const passport = require('passport')
 const hbs = require('express-hbs')
 const jwt = require('jsonwebtoken')
 
-const configPath = Path.join(process.cwd(), 'config.json')
-console.log('CONFIG=', configPath)
-const config = require(configPath)
-console.log('CONFIG', config)
+const app = express()
+module.exports = app
+app.config = require('./appConfig')
+app.pg = require('./postgresql')
+// app.users = require('./models/users')
+// app.hl = require('./hyperlinc')(config)
+
+const appName = app.config.name
 
 hbs.handlebars.registerHelper('toJSON', object =>
   new hbs.handlebars.SafeString(JSON.stringify(object), null, 2)
 )
 
-const appName = config.name
-const app = express()
-module.exports = app
-app.config = config
-
-app.sequelize = require('./sequelize')(app)
-app.users = require('./models/users')(app)
-// app.hl = require('./hyperlinc')(config)
 
 app.use(express.static(__dirname + '/public'));
 app.use(bodyParser.urlencoded({ extended: false }))
 app.use(bodyParser.json({ }))
 app.use(cookieParser())
 app.use(expressSession({
-  secret: config.sessionSecret,
+  secret: app.config.sessionSecret,
   resave: true,
   saveUninitialized: true,
 }))
@@ -45,9 +41,9 @@ app.set('view engine', 'hbs')
 app.set('views', __dirname + '/views')
 Object.assign(app.locals, {
   appName,
-  appColor: config.color,
+  appColor: app.config.color,
   // TODO move this static lists
-  partnerApps: config.partnerApps,
+  // partnerApps: app.config.partnerApps,
 })
 
 const SESSION_SECRET = `dont tell anyone this is ${appName}`
@@ -58,9 +54,9 @@ app.start = async function start(){
   // await app.hl.connect()
   const startHttpServer = () =>
     new Promise((resolve, reject) => {
-      app.server = app.listen(config.port, error => {
+      app.server = app.listen(app.config.port, error => {
         if (error) return reject(error);
-        console.log(`${appName} listening on port ${config.port} at ${config.url}`)
+        console.log(`${appName} listening on port ${app.config.port} at ${app.config.url}`)
         resolve();
       })
     })
@@ -114,7 +110,6 @@ router.use('*', async (req, res, next) => {
 router.get('/', async (req, res) => {
   res.render('index', {
     users: await app.users.findAll(),
-    hyperlincStatus: await app.hl.status(),
   })
 })
 

@@ -25,9 +25,12 @@
     "express": "^4.17.3",
     "express-hbs": "^2.4.0",
     "express-promise-router": "^4.1.1",
+    "express-session": "^1.17.3",
     "hyperlinc": "file:hyperlinc",
     "jsonwebtoken": "^8.5.1",
-    "pg": "^8.7.3"
+    "passport": "^0.5.3",
+    "pg": "^8.7.3",
+    "sequelize": "^6.19.0"
   },
   "devDependencies": {
     "concurrently": "^7.0.0"

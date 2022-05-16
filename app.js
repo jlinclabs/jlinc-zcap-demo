@@ -1,42 +1,42 @@
+const Path = require('path')
 const express = require('express')
 const Router = require("express-promise-router");
 const bodyParser = require('body-parser')
 const cookieParser = require('cookie-parser')
+const expressSession = require('express-session')
+const passport = require('passport')
 const hbs = require('express-hbs')
 const jwt = require('jsonwebtoken')
+
+const configPath = Path.join(process.cwd(), 'config.json')
+console.log('CONFIG=', configPath)
+const config = require(configPath)
+console.log('CONFIG', config)
 
 hbs.handlebars.registerHelper('toJSON', object =>
   new hbs.handlebars.SafeString(JSON.stringify(object), null, 2)
 )
 
-// appDirectory = Path.resolve(appDirectory)
-// if (!appDirectory) throw new Error(`app directory required`)
-// process.chdir(appDirectory)
-// const configPath = Path.resolve(appDirectory + '/config.json')
-// const config = require(configPath)
-// config.appDirectory = appDirectory
-// if (process.env.PORT) config.port = process.env.PORT
-// return createHttpServer(config)
-
-
-const appName = options.name
-
+const appName = config.name
 const app = express()
 module.exports = app
+app.config = config
 
-app.port = getEnvVar('PORT')
-app.storagePath = getEnvVar('JLINX_STORAGE')
-
-app.port = options.port
-app.url = options.url
-app.pg = require('./postgresql')(options)
-app.hl = require('./hyperlinc')(options)
+app.sequelize = require('./sequelize')(app)
 app.users = require('./models/users')(app)
+// app.hl = require('./hyperlinc')(config)
 
 app.use(express.static(__dirname + '/public'));
 app.use(bodyParser.urlencoded({ extended: false }))
 app.use(bodyParser.json({ }))
 app.use(cookieParser())
+app.use(expressSession({
+  secret: config.sessionSecret,
+  resave: true,
+  saveUninitialized: true,
+}))
+app.use(passport.initialize())
+app.use(passport.session())
 app.engine('hbs', hbs.express4({
   partialsDir: __dirname + '/views/partials',
   defaultLayout: __dirname + '/views/layout/default.hbs',
@@ -45,22 +45,30 @@ app.set('view engine', 'hbs')
 app.set('views', __dirname + '/views')
 Object.assign(app.locals, {
   appName,
-  appColor: options.color,
+  appColor: config.color,
   // TODO move this static lists
-  partnerApps: options.partnerApps,
+  partnerApps: config.partnerApps,
 })
 
 const SESSION_SECRET = `dont tell anyone this is ${appName}`
 const COOKIE_NAME = `session`
 
 app.start = async function start(){
-  await app.pg.connect()
-  await app.hl.connect()
-  await new Promise((resolve, reject) => {
-    app.server = app.listen(app.port, error => {
-      if (error) reject(error); else resolve();
+  // await app.pg.connect()
+  // await app.hl.connect()
+  const startHttpServer = () =>
+    new Promise((resolve, reject) => {
+      app.server = app.listen(config.port, error => {
+        if (error) return reject(error);
+        console.log(`${appName} listening on port ${config.port} at ${config.url}`)
+        resolve();
+      })
     })
-  })
+
+  await Promise.all([
+    app.sequelize.authenticate(),
+    startHttpServer()
+  ])
 }
 
 // ROUTES
@@ -105,7 +113,7 @@ router.use('*', async (req, res, next) => {
 
 router.get('/', async (req, res) => {
   res.render('index', {
-    users: await app.users.getAll(),
+    users: await app.users.findAll(),
     hyperlincStatus: await app.hl.status(),
   })
 })

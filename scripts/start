@@ -1,18 +1,8 @@
 #!/usr/bin/env node
 
-const getHttpServer = require('../http-server')
+if (process.argv[2]) process.chdir(process.argv[2])
 
-const app = getHttpServer(process.argv[2] || '.')
-if (!app){
-  console.error(`app not found`)
+require('../app').start().catch(error => {
+  console.error(error)
   process.exit(1)
-}
-
-app.start().then(
-  () => {
-    console.log(`${app.name} PORT=${app.port} ${app.url}`)
-  },
-  error => {
-    console.error(error)
-  },
-)
+})

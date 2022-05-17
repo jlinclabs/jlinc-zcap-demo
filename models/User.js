@@ -7,6 +7,19 @@ class User {
     return records.map(record => new User(record))
   }
 
+  static async auth(username, password){
+    console.log('User.auth', { username, password })
+    const user = await this.findByUsername(username)
+    return !!(user && await user.verifyPassword(password))
+  }
+
+  static async findByUsername(username){
+    return await knex('users')
+      .select('*')
+      .where({ username })
+      .limit(1)
+  }
+
 }
 
 module.exports = User

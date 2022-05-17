@@ -1,10 +1,12 @@
 const Path = require('path')
+const crypto = require('crypto')
 const express = require('express')
 const Router = require("express-promise-router");
 const bodyParser = require('body-parser')
 const cookieParser = require('cookie-parser')
 const expressSession = require('express-session')
 const passport = require('passport')
+const PassportLocal = require('passport-local')
 const hbs = require('express-hbs')
 const jwt = require('jsonwebtoken')
 
@@ -21,18 +23,38 @@ hbs.handlebars.registerHelper('toJSON', object =>
   new hbs.handlebars.SafeString(JSON.stringify(object), null, 2)
 )
 
-
 app.use(express.static(__dirname + '/public'));
 app.use(bodyParser.urlencoded({ extended: false }))
 app.use(bodyParser.json({ }))
 app.use(cookieParser())
+
+
+// AUTHENTICATION
+
 app.use(expressSession({
   secret: app.config.sessionSecret,
   resave: true,
   saveUninitialized: true,
 }))
-app.use(passport.initialize())
-app.use(passport.session())
+// app.use(passport.initialize())
+// app.use(passport.session())
+app.use(passport.authenticate('session'))
+passport.use(new PassportLocal((username, password, done) => {
+  console.log('passport', { username, password })
+
+  app.users.auth(username, password).then(
+    user => done(null, user),
+    error => done(error),
+  )
+}))
+passport.serializeUser((user, done) => {
+  done({ username: user.username })
+})
+passport.deserializeUser((user, done) => {
+  app.users.findByUsername(user.username)
+})
+
+// VIEWS
 app.engine('hbs', hbs.express4({
   partialsDir: __dirname + '/views/partials',
   defaultLayout: __dirname + '/views/layout/default.hbs',
@@ -45,9 +67,6 @@ Object.assign(app.locals, {
   // TODO move this static lists
   // partnerApps: app.config.partnerApps,
 })
-
-const SESSION_SECRET = `dont tell anyone this is ${appName}`
-const COOKIE_NAME = `session`
 
 app.start = async function start(){
   // await app.pg.connect()
@@ -71,41 +90,30 @@ app.start = async function start(){
 const router = Router()
 app.use(router)
 
-async function verifySession(sessionJwt){
-  const session = await new Promise((resolve, reject) => {
-    jwt.verify(sessionJwt, SESSION_SECRET, (error, session) => {
-      if (error) reject(error)
-      else resolve(session)
-    })
-  })
+// router.use('*', async (req, res, next) => {
+//   // const sessionJwt = req.cookies[COOKIE_NAME]
+//   // let session
+//   // if (sessionJwt){
+//   //   try{
+//   //     session = await verifySession(sessionJwt)
+//   //   }catch(error){
+//   //     res.cookie('session', null)
+//   //   }
+//   // }
 
-  return session
-}
+//   // let currentUser
+//   // if (session) {
+//   //   currentUser = await app.users.get(session.username)
+//   //   if (!currentUser){
+//   //     res.status(401).clearCookie(COOKIE_NAME).redirect('/')
+//   //     return
+//   //   }
+//   // }
 
-router.use('*', async (req, res, next) => {
-  const sessionJwt = req.cookies[COOKIE_NAME]
-  let session
-  if (sessionJwt){
-    try{
-      session = await verifySession(sessionJwt)
-    }catch(error){
-      res.cookie('session', null)
-    }
-  }
+//   Object.assign(res.locals, { session, currentUser })
 
-  let currentUser
-  if (session) {
-    currentUser = await app.users.get(session.username)
-    if (!currentUser){
-      res.status(401).clearCookie(COOKIE_NAME).redirect('/')
-      return
-    }
-  }
-
-  Object.assign(res.locals, { session, currentUser })
-
-  next()
-})
+//   next()
+// })
 
 router.get('/', async (req, res) => {
   res.render('index', {
@@ -114,45 +122,28 @@ router.get('/', async (req, res) => {
 })
 
 router.get('/login', async (req, res) => {
-  if (req.query.zcap){
-    const delegatedCapability = zcap.verifyZcapInvocation(req.query.zcap);
-    const jlincDid = delegatedCapability.zcap.invokerDid
-    const user = await app.users.findByJlincDid(jlincDid)
-    return user
-      ? createSessionCookie(res, user.username)
-      : res.render('zcapsignup', { jlincDid })
-  }else{
-    res.render('login')
-  }
+  res.render('login')
 })
 
-function createSessionCookie(res, username, destination = '/'){
-  if (!username) throw new Error('no username!')
-  res
-    .cookie(COOKIE_NAME, jwt.sign(
-      { username },
-      SESSION_SECRET,
-      { expiresIn: 86400 }
-    ))
-    .redirect(destination)
-}
-
-router.post('/login', async (req, res) => {
-  const { username } = req.body
-  const user = await app.users.get(username)
-  if (user) {
-    createSessionCookie(res, user.username)
-  }else{
-    res
-      .clearCookie(COOKIE_NAME)
-      .render('error', {
-        error: { message: `user "${username}" not found` },
-      })
+router.post(
+  '/login',
+  async (req, res, next) => {
+    console.log(req.body)
+    next()
+  },
+  passport.authenticate('local', {
+    failureRedirect: '/login',
+    ailureMessage: true,
+  }),
+  async (req, res) => {
+    res.redirect('/')
   }
-})
+)
+
 
 router.post('/logout', (req, res) => {
-  res.status(200).clearCookie(COOKIE_NAME).redirect('/')
+  req.logout()
+  res.redirect('/')
 })
 
 router.get('/signup', (req, res) => {

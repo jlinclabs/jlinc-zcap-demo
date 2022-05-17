@@ -19,23 +19,16 @@
   </ul>
 
 {{else}}
-  <h5>Welcome New User</h5>
-
-  <form method="post" action="/login">
-    <p>
-      <label for="login-input-username">Login</label><br/>
-      <input required id="login-input-username"
-        pattern="[a-z]{1}[a-z0-9]{3,20}"
-        type="text" name="username" placeholder="username"
-      />
-      <button type="submit" class="btn btn-primary">LOGIN</button>
-    </p>
-  </form>
-
-  <a href="/signup">signup</a>
+  <h5>Welcome</h5>
+  <ul>
+    <li><a href="/signup">signup</a></li>
+    <li><a href="/login">login</a></li>
+  </ul>
 {{/if}}
 
-<hr/>
+<a href="/dids/resolve">resolve a did</a>
+
+{{!-- <hr/>
 
 <h5>Other Apps</h5>
 <ul>
@@ -73,4 +66,4 @@
 <h5>Hyperlinc Status</h5>
 <p>Connected: {{#if hyperlincStatus.connected}}yes{{else}}no{{/if}}</p>
 <p># of cores: {{hyperlincStatus.numberOfCores}}</p>
-<p>CORES:<br/>{{toJSON hyperlincStatus.cores}}</p>
+<p>CORES:<br/>{{toJSON hyperlincStatus.cores}}</p> --}}
